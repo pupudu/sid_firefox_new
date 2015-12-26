@@ -1,2 +1,2 @@
-# sid_firefox_new
-firefox addon for social ID FYP
+#Social ID
+Firefox version for social ID FYP

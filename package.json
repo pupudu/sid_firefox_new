@@ -1,0 +1,12 @@
+{
+  "title": "Social ID",
+  "name": "sid",
+  "version": "0.0.1",
+  "description": "Firefox version for social ID FYP",
+  "main": "auth.js",
+  "author": "Pubudu Dodangoda",
+  "engines": {
+    "firefox": ">=38.0a1"
+  },
+  "license": "MIT"
+}
