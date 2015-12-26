@@ -17,9 +17,9 @@ var button = buttons.ActionButton({
   id: "mozilla-link",
   label: "Visit Mozilla",
   icon: {
-    "16": "./icon-16.png",
-    "32": "./icon-32.png",
-    "64": "./icon-64.png"
+    "16": "resources/icons/icon-16.png",
+    "32": "resources/icons/icon-32.png",
+    "64": "resources/icons/icon-64.png"
   },
   onClick: handleClick
 });
