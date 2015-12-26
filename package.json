@@ -3,7 +3,7 @@
   "name": "sid",
   "version": "0.0.1",
   "description": "Firefox version for social ID FYP",
-  "main": "auth.js",
+  "main": "index.js",
   "author": "Pubudu Dodangoda",
   "engines": {
     "firefox": ">=38.0a1"
