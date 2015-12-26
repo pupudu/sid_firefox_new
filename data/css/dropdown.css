@@ -1,0 +1,66 @@
+.sid_dropdown,
+.sid_dropdown ul,
+.sid_dropdown li{
+  margin  : 0;
+  padding : 0;
+}
+
+.sid_dropdown ul{
+  display  : none;
+  position : absolute;
+  top      : 100%;
+  left     : 0;
+  z-index  : 1;
+}
+
+.sid_dropdown ul ul{
+  top  : 0;
+  left : 100%;
+}
+
+.sid_dropdown ul .sid_dropdownRightToLeft ul{
+  left  : auto;
+  right : 100%;
+}
+
+.sid_dropdown li{
+  position        : relative;
+  display         : block;
+  list-style-type : none;
+}
+
+.sid_dropdown > li{
+  display : inline-block;
+}
+
+.sid_dropdown a,
+.sid_dropdown span{
+  display         : block;
+  text-decoration : none;
+  white-space     : pre;
+}
+
+.sid_dropdown li:hover > ul{
+  display : block;
+}
+
+.sid_dropdownVertical{
+  display : inline-block;
+}
+
+.sid_dropdownVertical > li{
+  display : block;
+}
+
+.sid_dropdownVertical ul{
+  top  : 0;
+  left : 100%;
+}
+
+.sid_dropdownJavaScript li:hover > ul{
+  display : none;
+}
+
+.sid_dropdownJavaScript li.sid_dropdownOpen > ul{
+  display : block;
+}

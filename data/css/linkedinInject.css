@@ -1,0 +1,195 @@
+
+img.premium{
+	top:30px;
+	left:30px;
+	width:180px;
+	height:180px;
+}
+
+canvas.drop_chart{
+	width: 150px;
+	height: 150px;
+	min-width: 150px;
+	min-height: 150px;
+	margin-top:50px;
+	margin-left:50px;
+}
+
+img.profIcon {
+	position:absolute;
+	z-index:1;
+	display:none;
+	height: inherit;
+    width: inherit;
+	left:0px;
+	top:0px;
+}
+
+
+
+img.friendProfIcon{
+	position:absolute;
+	left:58px;
+	top:58px;
+	z-index:1;
+	height: 45px;
+	width: 45px;
+}
+
+img.claim{
+	position:absolute;
+	z-index:1;
+	height: 20px;
+    width: 20px;
+	left:295px;
+	top:5px;
+}
+
+img.popupbase{
+	position:absolute;
+	z-index:1;
+	height: 30px;
+    width: 30px;
+	cursor:pointer
+}
+
+div.claim_d{
+	position:absolute;
+	z-index:1;
+	height: 20px;
+    width: 20px;
+	left:295px;
+	top:5px;
+}
+
+div.claimWork_d{
+	position:relative;
+	z-index:1;
+	height: 40px;
+    width: 40px;
+	left:530px;
+	top:20px;
+}
+
+img.popup{
+	height: 30px;
+    width: 30px;
+}
+
+img.claimWork{
+	position:relative;
+	z-index:1;
+	height: 40px;
+    width: 40px;
+	left:520px;
+	top:15px;
+}
+
+div.claimMain_d{
+	position:absolute;
+	z-index:1;
+	height: 20px;
+    width: 20px;
+	left:-570px;
+	top:-20px;
+}
+
+img.claimMain{
+	position:relative;
+	z-index:1;
+	height: 20px;
+    width: 20px;
+	left:-570px;
+	top:-20px;
+}
+
+img.ring{
+	position:absolute;
+	z-index:1;
+	height: 20px;
+    width: 20px;
+	left:8px;
+	top:5px;
+}
+
+i.arrow{
+	position:absolute;
+	z-index:1;
+	left:105px;
+	top:20px;
+}
+
+ul.dropElement{
+	background-color: #ffffff;
+	outline-style: solid;
+    outline-width: thin;
+	outline-color: #bbbbdd;
+	width:250px;
+	max-width: 250px;
+	min-width: 130px;
+}
+
+canvas.sid_chart{
+	width: 150px;
+	height: 150px;
+	min-width: 150px;
+	min-height: 150px;
+	margin-top:25px;
+	margin-left:50px;
+}
+
+img.popup{
+	position:absolute;
+}
+
+div.Main{
+	position:absolute;
+	height:auto;
+	width:auto;
+	left:550px;
+}
+
+
+
+img.dropHeader{
+	width:250px;
+}
+
+
+
+a.verA{
+	width:inherit;
+	height:15px;
+}
+a.neuA{
+	width:inherit;
+	height:15px;
+}
+a.refA{
+	width:inherit;
+	height:15px;
+}
+
+div.popupChart{
+    position: absolute;
+    top: 0px;
+    left: 110px;
+    height: 108px;
+    width: 108px;
+    background-color: white;
+}
+
+
+canvas.mini_chart{
+	width: inherit;
+	height: inherit;
+	min-width: 99px;
+	min-height: 99px;
+	margin-top:0px;
+	margin-left:0px;
+}
+
+li.listElement{
+	width:110px;
+}
+
