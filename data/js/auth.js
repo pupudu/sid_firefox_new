@@ -30,8 +30,8 @@ function addLoadListner(){
 					if(status==="success"){
 						if(data.success){
 							console.log("Authentication success");
-							//setCookie("sidSession","true",3);	//expires after 3 days if not logged out
-							//injectCookie("sidSession","true",3); 	//inject to save cookie inside the main browser
+							setCookie("sidSession","true",3);	//expires after 3 days if not logged out
+							injectCookie("sidSession","true",3); 	//inject to save cookie inside the main browser
 							/*
 							chrome.storage.sync.set({
 								email: usr.value

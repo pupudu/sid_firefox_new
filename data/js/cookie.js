@@ -27,13 +27,13 @@ function setCookie(cname, cvalue, exdays) {
 function injectCookie(cname, cvalue, exdays){
     var strInject = 'document.cookie =' +"'" + formatCookie(cname, cvalue, exdays) +';'+"'";
 	console.log(strInject);
-	chrome.tabs.getSelected(null, function(tab) {
+	/*chrome.tabs.getSelected(null, function(tab) {
 		chrome.tabs.executeScript(tab.id,{
 			code:strInject
 		},function(){
-		/*Do Nothing*/
+		
 		});
-	});
+	});*/
 }
 
 /** Returns a formatted cookie from given params*/
