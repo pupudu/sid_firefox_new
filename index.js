@@ -1,7 +1,30 @@
+/**
+~~~~ToDo List LinkedIn~~~~
+	*Everything
+
+~~~~ToDo List FB~~~~
+	* attaching styles - done
+	* Add profile pic - done
+	* Add analytics menu - done
+	* Add icons to claims - done 
+	* Add popup menus to claim icons - done 
+	* Attach content scripts for every page update
+	* Reomve skip icons
+	* Fix rating issue in about sections
+	* save login session
+	
+~~~~Todo List Commons~~~~
+	* Rate twice issue in be 
+	* Replace not rated grey icon 
+	* Get valid ssl certificate
+	* premium accounts
+*/
+
 var buttons = require('sdk/ui/button/action');
 var tabs = require("sdk/tabs");
 var self = require("sdk/self");
 
+//For testing purposes only
 tabs.open("https://sid.projects.mrt.ac.lk:9000");
 tabs.open("https://www.facebook.com/pupudu");
 
@@ -38,10 +61,11 @@ function handleClick(state) {
       top:0,
       right: 0
     }
-	
   });
 }
 
+
+//replaced with pageMod
 function runScript(tab) {
 	
   //if(tab.url.search("https://web.facebook.com")!= -1){
