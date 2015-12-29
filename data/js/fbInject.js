@@ -83,10 +83,11 @@ function identify(){
 				manipulateAbout(fbstrings.lifeEventClaim,"Overview");
 			}
 			
-		}else if (selectedTab === "Timeline"){
+		}else if (selectedTab === "Timeline"){*/
+			console.log(selectedTab);
 			manipulateTimeLine();	
-			updFrndsProfInTimeLine();
-		}*/
+			//updFrndsProfInTimeLine();
+		//}
 	}else{
 		console.log("timeline if condition false")
 	}
@@ -180,7 +181,7 @@ function manipulateAbout(claimType,style){
 function manipulateTimeLine(){
 	var claimContainerAr = document.getElementsByClassName(fbstrings.timelineClaimContainer);
 	var claimCount = claimContainerAr.length; /*Number of claims on timeline*/
-	//console.log(".. .. updating fb time line" + claimAr.length);
+	console.log(".. .. updating fb time line" + claimContainerAr.length);
 	
 	/**Scoring claim summary*/
 	for(var i=0;i<claimCount;i++){
@@ -208,8 +209,8 @@ function addSidAnalyticsMenu(){
 		/*$.get("sid/data/html/sidAnalytics.html",function(data){
 			console.log(data);
 			node.innerHTML = data;*/
-			//document.getElementById("analytics_header").src = headerURL;
-			//document.getElementById("analytics_legend").src = legendURL;
+			document.getElementById("analytics_header").src = headerURL;
+			document.getElementById("analytics_legend").src = legendURL;
 			
 			commitDropdownChart(profId,document.getElementById("sidAnalyticsHTML"));
 			
@@ -252,7 +253,7 @@ function commitDropdownChart(profId,node){
 }
 
 function scoreClaims(arrIndex, claim, classOffset){
-	//console.log(".. .. scoring claims on time line" + claim.innerHTML);
+	console.log(".. .. scoring claims on time line" + claim.innerHTML);
 	var profID = extract_TargetId();
 	var rateIcon = document.createElement("DIV");
 	var iconID = 'claimR'+classOffset+arrIndex;
@@ -282,14 +283,14 @@ function scoreClaims(arrIndex, claim, classOffset){
 	//alert(claimId)
 	//console.log("............................."+ claim.getAttribute("data-html")+".......................")
 	arrIndex+=23;
-	//console.log(claim.getAttribute("data-html")+" "+profID+" "+claimId);
+	console.log(claim.getAttribute("data-html")+" "+profID+" "+claimId);
 	try{
 	$.post(fbstrings.sidServer+"/rate/facebook/getRating",{
 		targetid : profID,
 		claimid : claimId
 	},
 	function(data /*,status*/){
-		//console.log(JSON.stringify(data));
+		console.log(JSON.stringify(data));
 		claimScore = data.claimScore;
 		//var imgURL = chrome.extension.getURL("resources/icons/"+iconClass+claimScore+".png");
 		
@@ -463,7 +464,7 @@ function addEventToSendData(obj,claimId,iconId,iconClass,targetId,myId,claim,rat
 }
 
 function clearIconsIfSkip(item){
-	if(clearIconIfSkipUsingString(item)){return true;}
+	//if(clearIconIfSkipUsingString(item)){return true;}
 	if(clearEmptyIcons(item)){return true;}
 	return false;
 }
