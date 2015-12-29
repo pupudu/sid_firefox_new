@@ -338,9 +338,10 @@ function popUpOnIconByID(claim,iconId,iconClass,classOffset,yes,no,notSure){ //T
 	//console.log(claimId+" "+ claim.innerText.trim()+" "+targetId+" "+myId);
 	
 	//$.get(chrome.extension.getURL("html/ratePopup.html"), function(data) {
-	$.get(self.options.ratePopup, function(data) {
+	//$.get(self.options.ratePopup, function(data) {
 		
-		node.innerHTML = data;
+		//node.innerHTML = data;
+		node.innerHTML = self.options.ratePopup;
 		node.className=iconClass+classOffset;
 		document.getElementById(iconId).parentNode.appendChild(node);
 		
@@ -392,7 +393,7 @@ function popUpOnIconByID(claim,iconId,iconClass,classOffset,yes,no,notSure){ //T
 		chartConfigs.base = "popupbase"
 		
 		addChartListener(chartData,chartConfigs,claim);
-	});
+	//});
 }
 
 function addEventToSendData(obj,claimId,iconId,iconClass,targetId,myId,claim,rate){
