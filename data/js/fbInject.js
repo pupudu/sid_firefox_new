@@ -9,7 +9,7 @@ var timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//e
 
 
 if(document.getElementById(fbstrings.profileName)!=null){
-	console.log(document.getElementById(fbstrings.profileName).innerHTML);
+	//console.log(document.getElementById(fbstrings.profileName).innerHTML);
 }
 /*
 $.get("https://www.facebook.com/Pupudu",function(data){
@@ -65,17 +65,17 @@ function identify(){
 		
 		updateProfPic(false);
 		addSidAnalyticsMenu();
-		
+		/*
 		if(selectedTab === "About") {
 			var subsection = document.getElementsByClassName(fbstrings.subSection)[0];
 			if(subsection.innerText === "Work and Education"){
-				//manipulateAboutWork();		/*if an fb about work page, and haven't modified before, then add sid elements*/
+				//manipulateAboutWork();		
 				manipulateAbout(fbstrings.workClaim,"Work");
 			}
-									/**TODO add similar functionality to places lived, Basic info, family, and life events*/
+								
 									
 			else if(subsection.innerText === "Life Events"){
-				//manipulateLifeEvents();		/*if an fb about work page, and haven't modified before, then add sid elements*/
+				//manipulateLifeEvents();		
 				manipulateAbout(fbstrings.lifeEventClaim,"Events");
 			}
 			else if(subsection.innerText === "Overview"){
@@ -84,9 +84,9 @@ function identify(){
 			}
 			
 		}else if (selectedTab === "Timeline"){
-			manipulateTimeLine();	/*if an fb profile timeline, and haven't modified before, then add sid elements*/
+			manipulateTimeLine();	
 			updFrndsProfInTimeLine();
-		}
+		}*/
 	}else{
 		console.log("timeline if condition false")
 	}
@@ -114,7 +114,8 @@ function updateProfPic(manual){
 	},
 	function(data/*, status*/){
 		//alert(JSON.stringify(data))
-		console.log(data);
+		//console.log(data);
+		//console.log(profID);
 		//imgURL = chrome.extension.getURL("resources/icons/prof" + data.ratingLevel + ".png");
 		imgURL = self.options.profPng[0];
 		if(document.getElementById(fbstrings.sidSign) !== null){
@@ -193,6 +194,7 @@ function addSidAnalyticsMenu(){
 		console.log(".. .. .. added sid analytics pop up memu");
 		var profId = extract_TargetId();
 		var node = document.createElement("DIV");  
+		//node.id = "dodan";
 		
 		//var headerURL = chrome.extension.getURL("resources/images/analytics_header.png");
 		//var legendURL = chrome.extension.getURL("resources/images/legend.png");
@@ -200,13 +202,16 @@ function addSidAnalyticsMenu(){
 		var legendURL = self.options.profPng[0];
 		
 		//$.get(chrome.extension.getURL("html/sidAnalytics.html"), function(data) {
-		$.get(self.options.sidChart,function(data){
+		//console.log(self.options.sidChart1);
+		document.getElementsByClassName('_6_7 clearfix')[0].insertAdjacentHTML('beforeend',self.options.sidChart);
+		//node.innerHTML = self.options.sidChart;
+		/*$.get("sid/data/html/sidAnalytics.html",function(data){
 			console.log(data);
-			node.innerHTML = data;
-			document.getElementById("analytics_header").src = headerURL;
-			document.getElementById("analytics_legend").src = legendURL;
+			node.innerHTML = data;*/
+			//document.getElementById("analytics_header").src = headerURL;
+			//document.getElementById("analytics_legend").src = legendURL;
 			
-			commitDropdownChart(profId,node);
+			commitDropdownChart(profId,document.getElementById("sidAnalyticsHTML"));
 			
 			try{
 				$.post(fbstrings.sidServer+"/test/getLinkedinURL",{
@@ -220,8 +225,9 @@ function addSidAnalyticsMenu(){
 					notie.alert(3, 'Linked In profile not connected', 3);
 				});
 			}
-		});
-		document.getElementsByClassName(fbstrings.fbMenubar)[0].appendChild(node);
+		//});
+		//document.getElementsByClassName(fbstrings.fbMenubar)[0].appendChild(node);
+		//document.getElementById("dodan").innerHTML = self.options.sidChart;
 	}
 }
 
@@ -230,7 +236,7 @@ function commitDropdownChart(profId,node){
 		targetid : profId
 	},
 	function(rating /*,status*/){
-		console.log(rating);
+		//console.log(rating);
 		var chartData = {};
 		chartData.yesCount = rating.yes;
 		chartData.noCount = rating.no;
@@ -283,7 +289,7 @@ function scoreClaims(arrIndex, claim, classOffset){
 		claimid : claimId
 	},
 	function(data /*,status*/){
-		console.log(JSON.stringify(data));
+		//console.log(JSON.stringify(data));
 		claimScore = data.claimScore;
 		//var imgURL = chrome.extension.getURL("resources/icons/"+iconClass+claimScore+".png");
 		
@@ -293,7 +299,7 @@ function scoreClaims(arrIndex, claim, classOffset){
 		if(icon!==null){
 			icon.src = imgURL;
 			popUpOnIconByID(claim,iconID,iconClass,classOffset,data.yes,data.no,data.notSure);
-			console.log(data.yes+" "+data.no+" "+data.notSure);
+			//console.log(data.yes+" "+data.no+" "+data.notSure);
 		}
 		else{
 			console.log("info .. .. .. Icons already added");
@@ -413,7 +419,7 @@ function addEventToSendData(obj,claimId,iconId,iconClass,targetId,myId,claim,rat
 			rating: rate
 		},
 		function(data){
-			console.log(data);
+			//console.log(data);
 			if(data.success !== true){
 				setTimeout(function(){
 					notie.alert(3, 'An unexpected error occured! Please Try Again', 3);
@@ -429,7 +435,7 @@ function addEventToSendData(obj,claimId,iconId,iconClass,targetId,myId,claim,rat
 					targetid : targetId,
 					claimid : claimId
 				},function(data){
-					console.log(data);
+					//console.log(data);
 					var chartData = {};
 					chartData.yesCount = data.yes;
 					chartData.noCount = data.no;

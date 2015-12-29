@@ -3,7 +3,7 @@ var tabs = require("sdk/tabs");
 var self = require("sdk/self");
 
 tabs.open("https://sid.projects.mrt.ac.lk:9000");
-tabs.open("https://www.facebook.com");
+tabs.open("https://www.facebook.com/pupudu");
 
 require("sdk/tabs").on("ready", runScript);
 
@@ -73,7 +73,7 @@ var pageMod = require("sdk/page-mod");
 
 pageMod.PageMod({
   include: "*.facebook.com",
-  contentStyleFile: "./style.css"
+  contentStyleFile: ["./css/fbInject.css","./css/dropdown.css"]
 });
 
   

@@ -9,7 +9,7 @@
     "firefox": ">=38.0a1"
   },
   "permissions": {
-    "cross-domain-content": ["https://sid.projects.mrt.ac.lk:9000"]
+    "cross-domain-content": ["https://sid.projects.mrt.ac.lk:9000","https://web.facebook.com/","https://www.facebook.com/"]
   },
   "license": "MIT"
 }
