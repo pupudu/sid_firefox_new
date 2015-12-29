@@ -1,12 +1,14 @@
 /* globals chrome,Chart,getCookie,fbstrings,notie: false */
 //TODO - Realtime update icons when rated a claim
 //console.log(fbstrings.dodan);
+if(document.getElementsByClassName("ego_section").length>0){
+	document.getElementsByClassName("ego_section")[0].remove();
+}
 
 var timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
 //var UpStatBtn = document.getElementsByClassName('uiIconText _51z7')[0];		//element to identify fb wall
 //var membersBtn = document.getElementsByClassName('_2l5d')[1];				//element to identify fb group
 var timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
-
 
 if(document.getElementById(fbstrings.profileName)!=null){
 	//console.log(document.getElementById(fbstrings.profileName).innerHTML);
@@ -60,34 +62,32 @@ $.get("https://www.facebook.com/Pupudu",function(data){
 function identify(){
 	console.log(".. Identifying Web Page");
 	if(timeLineCName!==null && timeLineHLine!==null){
-		var selectedTab = document.getElementsByClassName(fbstrings.selectedTab)[0].innerText;
+		var selectedTab = document.getElementsByClassName(fbstrings.selectedTab)[0].innerHTML;
 		console.log(".. .. selected tab is: " + selectedTab);
 		
 		updateProfPic(false);
 		addSidAnalyticsMenu();
-		/*
-		if(selectedTab === "About") {
-			var subsection = document.getElementsByClassName(fbstrings.subSection)[0];
-			if(subsection.innerText === "Work and Education"){
+		
+		if(selectedTab.indexOf("About") === 0) {
+			var subsection = document.getElementsByClassName(fbstrings.subSection)[0].innerHTML;
+			if(subsection.indexOf("Work and Education") ===0 ){
 				//manipulateAboutWork();		
 				manipulateAbout(fbstrings.workClaim,"Work");
-			}
-								
-									
-			else if(subsection.innerText === "Life Events"){
+			}				
+			else if(subsection.indexOf("Life Events") ===0 ){
 				//manipulateLifeEvents();		
 				manipulateAbout(fbstrings.lifeEventClaim,"Events");
 			}
-			else if(subsection.innerText === "Overview"){
+			else if(subsection.indexOf("Overview") ===0 ){
 				//manipulateOverview();
 				manipulateAbout(fbstrings.lifeEventClaim,"Overview");
 			}
 			
-		}else if (selectedTab === "Timeline"){*/
-			console.log(selectedTab);
+		}else if (selectedTab.indexOf("Timeline") === 0){
+			console.log("selectedTab: "+ selectedTab);
 			manipulateTimeLine();	
 			//updFrndsProfInTimeLine();
-		//}
+		}
 	}else{
 		console.log("timeline if condition false")
 	}
@@ -118,7 +118,7 @@ function updateProfPic(manual){
 		//console.log(data);
 		//console.log(profID);
 		//imgURL = chrome.extension.getURL("resources/icons/prof" + data.ratingLevel + ".png");
-		imgURL = self.options.profPng[0];
+		imgURL = self.options.profPng[data.ratingLevel];
 		if(document.getElementById(fbstrings.sidSign) !== null){
 			document.getElementById(fbstrings.sidSign).src = imgURL;
 		}
@@ -157,13 +157,13 @@ function addIconToFriendProf(profID, friendStr){
 		},
 		function(data){
 			//var imgURL = chrome.extension.getURL("resources/icons/prof" + data.ratingLevel + ".png");
-			var imgURL = self.options.profPng[0];
+			var imgURL = self.options.profPng[data.ratingLevel];
 			document.getElementById(friendStr).src = imgURL;
 		});
 	}catch(e){
 		//console.error(e);
 		//var imgURL = chrome.extension.getURL("resources/icons/profN.png");
-		var imgURL = self.options.profPng[0];
+		var imgURL = self.options.profPng["N"];
 		document.getElementById(friendStr).src = imgURL;
 	}
 }
@@ -199,11 +199,12 @@ function addSidAnalyticsMenu(){
 		
 		//var headerURL = chrome.extension.getURL("resources/images/analytics_header.png");
 		//var legendURL = chrome.extension.getURL("resources/images/legend.png");
-		var headerURL = self.options.profPng[0];
-		var legendURL = self.options.profPng[0];
+		var headerURL = self.options.anaHeader;
+		var legendURL = self.options.anaLegend;
 		
 		//$.get(chrome.extension.getURL("html/sidAnalytics.html"), function(data) {
 		//console.log(self.options.sidChart1);
+		/**Todo - replace using innerHTML*/
 		document.getElementsByClassName('_6_7 clearfix')[0].insertAdjacentHTML('beforeend',self.options.sidChart);
 		//node.innerHTML = self.options.sidChart;
 		/*$.get("sid/data/html/sidAnalytics.html",function(data){
@@ -294,7 +295,7 @@ function scoreClaims(arrIndex, claim, classOffset){
 		claimScore = data.claimScore;
 		//var imgURL = chrome.extension.getURL("resources/icons/"+iconClass+claimScore+".png");
 		
-		var imgURL = self.options.claimPng[0];
+		var imgURL = self.options.claimPng[claimScore];
 		
 		var icon = document.getElementById(iconID);
 		if(icon!==null){
@@ -310,7 +311,7 @@ function scoreClaims(arrIndex, claim, classOffset){
 		//console.error(e);
 		//var imgURL = chrome.extension.getURL("resources/icons/"+iconClass+"N.png");
 		
-		var imgURL = self.options.claimPng[0];
+		var imgURL = self.options.claimPng["N"];
 		
 		var icon = document.getElementById(iconID);
 		if(icon!==null){
@@ -355,10 +356,10 @@ function popUpOnIconByID(claim,iconId,iconClass,classOffset,yes,no,notSure){ //T
 		//var refImgUrl = chrome.extension.getURL("resources/icons/claimR.png");
 		//var baseImgUrl = chrome.extension.getURL("resources/icons/popupBase.png");
 		
-		var verImgUrl = self.options.claimPng[2];
-		var neuImgUrl = self.options.claimPng[2];
-		var refImgUrl = self.options.claimPng[2];
-		var baseImgUrl = self.options.claimPng[2];
+		var verImgUrl = self.options.claimPng["T"];
+		var neuImgUrl = self.options.claimPng["C"];
+		var refImgUrl = self.options.claimPng["R"];
+		var baseImgUrl = self.options.popupBase;
 		
 		
 		
@@ -450,7 +451,7 @@ function addEventToSendData(obj,claimId,iconId,iconClass,targetId,myId,claim,rat
 					
 					//var imgURL = chrome.extension.getURL("resources/icons/"+iconClass+data.claimScore+".png");
 					
-					var imgURL = self.options.claimPng[2];
+					var imgURL = self.options.claimPng[data.claimScore];
 					
 					document.getElementById(iconId).src=imgURL;
 					drawPieChart(chartData,chartConfigs,claim);
@@ -641,7 +642,7 @@ function drawPieChart(chartData,chartConfigs,parent){
 		}
 	}else{
 		//var imgUrl = chrome.extension.getURL("resources/images/notRatedInfo.png");
-		var imgUrl = self.options.claimPng[2];
+		var imgUrl = self.options.notRatedInfo;
 		base_image = new Image();
 		base_image.src = imgUrl;
 		ctx.drawImage(base_image,0,0,300,150);

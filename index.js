@@ -25,9 +25,9 @@ var button = buttons.ActionButton({
   id: "mozilla-link",
   label: "Visit Mozilla",
   icon: {
-    "16": "./resources/icons/icon-16.png",
-    "32": "./resources/icons/icon-32.png",
-    "64": "./resources/icons/icon-64.png"
+    "16": "./icons/icon-16.png",
+    "32": "./icons/icon-32.png",
+    "64": "./icons/icon-64.png"
   },
   onClick: handleClick
 });
@@ -86,11 +86,16 @@ pageMod.PageMod({
 		self.data.url("js/notie.js")
 	],
 	contentScriptOptions: {
-		claimPng: [self.data.url("resources/icons/claimC.png"),self.data.url("resources/icons/claimR.png"),self.data.url("resources/icons/claimT.png")],
-		profPng:[self.data.url("resources/icons/profC.png"),self.data.url("resources/icons/profR.png"),self.data.url("resources/icons/profT.png")],
+		claimPng: {"C" : self.data.url("icons/claimC.png"), "R" : self.data.url("icons/claimR.png"), "T" : self.data.url("icons/claimT.png") , "N" : self.data.url("icons/claimN.png")},
+		ringPng: {"C" : self.data.url("icons/ringC.png"), "R" : self.data.url("icons/ringR.png"), "T" : self.data.url("icons/ringT.png") , "N" : self.data.url("icons/ringN.png")},
+		profPng:{"C" : self.data.url("icons/profC.png"), "R" : self.data.url("icons/profR.png"), "T" : self.data.url("icons/profT.png") , "N" : self.data.url("icons/profN.png")},
+		profLiPng:{"C" : self.data.url("icons/prof_li_C.png"), "R" : self.data.url("icons/prof_li_R.png"), "T" : self.data.url("icons/prof_li_T.png") , "N" : self.data.url("icons/prof_li_N.png")},
+		popupBase:  self.data.url("icons/popupBase.png"),
+		anaHeader:  self.data.url("images/analytics_header.png"),
+		anaLegend:  self.data.url("images/legend.png"),
+		notRatedInfo:  self.data.url("images/notRatedInfo.png"),
 		sidChart:self.data.load("html/sidAnalytics.html"),
-		sidChart1:self.data.url("html/sidAnalytics.html"),
-		ratePopup:self.data.load("html/ratePopup.html")
+		ratePopup:self.data.load("html/ratePopup.html"),
 	}
 });
 
