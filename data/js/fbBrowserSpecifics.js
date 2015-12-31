@@ -1,3 +1,11 @@
+var count = 0;
+setInterval(function(){
+	console.log(count++);
+	timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
+	timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
+	identify();
+},6000);
+
 /*need separate implementation for firefox and chrome*/
 function addSidAnalyticsMenu(){
 	setTimeout(function(){
@@ -27,6 +35,5 @@ function popUpOnIconByID(popupData){
 
 /*need separate implementation for firefox and chrome*/
 function getURL(type,item){
-	console.log(type+" "+item);
 	return self.options.url[type.toString()][item.toString()];
 }

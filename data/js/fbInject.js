@@ -1,13 +1,13 @@
 /* globals chrome,Chart,getCookie,fbstrings,notie: false */
 
-console.log(fbstrings.dodan);
+//console.log(fbstrings.dodan);
+
+var timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
+var timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
 
 if(document.getElementsByClassName("ego_section").length>0){
 	document.getElementsByClassName("ego_section")[0].remove();
 }
-
-var timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
-var timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
 
 identify();	
 
@@ -43,6 +43,7 @@ function identify(){
 		}
 	}else{
 		console.log("timeline if condition false")
+		console.log(document.getElementById("fb-timeline-cover-name"));
 	}
 }
 
