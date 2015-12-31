@@ -20,7 +20,7 @@ function addLoadListner(){
 					return;
 				}
 				console.log(usr.value+" "+pwd.value);
-				$.post(sidServer+"/authenticate",
+				$.post(fbstrings.sidServer+"/authenticate",
 				{
 					username: usr.value,	//get value from input text field
 					password: pwd.value		//get value from input text field
@@ -51,7 +51,7 @@ function addLoadListner(){
 												node.innerHTML=data;
 												try{
 													var fbid = node.getElementsByTagName("meta")[4].getAttribute("content").substring(13);
-													$.post(sidServer+"/rate/facebook/setID",
+													$.post(fbstrings.sidServer+"/rate/facebook/setID",
 													{
 														email: usr.value,	
 														uid: fbid		
