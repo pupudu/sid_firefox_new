@@ -20,7 +20,7 @@ function addLoadListner(){
 					return;
 				}
 				console.log(usr.value+" "+pwd.value);
-				$.post("https://sid.projects.mrt.ac.lk:9000/authenticate",
+				$.post(sidServer+"/authenticate",
 				{
 					username: usr.value,	//get value from input text field
 					password: pwd.value		//get value from input text field
@@ -51,7 +51,7 @@ function addLoadListner(){
 												node.innerHTML=data;
 												try{
 													var fbid = node.getElementsByTagName("meta")[4].getAttribute("content").substring(13);
-													$.post("https://sid.projects.mrt.ac.lk:9000/rate/facebook/setID",
+													$.post(sidServer+"/rate/facebook/setID",
 													{
 														email: usr.value,	
 														uid: fbid		
