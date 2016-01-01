@@ -1,8 +1,15 @@
+if(getCookie("sidSession")!=="true"){
+	console.log("cookie mismatch");
+}else{
+	console.log("===========================cookie success");
+}
+
 var count = 0;
 setInterval(function(){
 	console.log(count++);
 	timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
 	timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
+	removeAds();
 	identify();
 },6000);
 

@@ -5,6 +5,12 @@
 if(getCookie("sidSession")==="true"){	
 	window.open('main.html','_self');
 }*/
+
+if(getCookie("sidSession")==="true"){	/*TODO Manipulate Cookies with a better approach*/
+	//send message to popup the logout screen
+	self.port.emit("logout_popup", "popup logout html");
+}
+
 addLoadListner();
 
 function addLoadListner(){
@@ -37,6 +43,8 @@ function addLoadListner(){
 								email: usr.value
 							});
 							*/
+							
+							
 							console.log(data);
 							if(data.linked===true){
 								if(data.fbid===undefined || data.fbid === ""){
@@ -63,7 +71,8 @@ function addLoadListner(){
 													console.error(e);
 												}
 												console.log(profID);
-												window.open('main.html','_self');
+												//window.open('main.html','_self');
+												self.port.emit("logout_popup", "popup logout html");
 											});
 										}catch(e){
 											console.error(e);

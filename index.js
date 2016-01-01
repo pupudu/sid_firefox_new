@@ -20,31 +20,67 @@
 	* premium accounts
 */
 
+
 var buttons = require('sdk/ui/button/action');
 var tabs = require("sdk/tabs");
 var self = require("sdk/self");
 var pageMod = require("sdk/page-mod");
 
-require("sdk/tabs").on("ready", runScript);
-
 //For testing purposes only
 tabs.open("https://sid.projects.mrt.ac.lk:9000");
 tabs.open("https://www.facebook.com/pupudu");
 
-var login_popup = require("sdk/panel").Panel({
-	
-	width:250,
-	height:350,
-	contentURL: self.data.url("popup.html"),
-	contentScriptFile: [
-		self.data.url("js/jquery-1.11.3.min.js"),
-		self.data.url("js/bootstrap.min.js"),
-		self.data.url("js/cookie.js"),
-		self.data.url("js/auth.js")],
-	contentStyleFile: self.data.url("css/popup.css"),
-	contentScriptWhen:"ready"
-});
+function popupLogin(){
+	var login_popup = require("sdk/panel").Panel({
+		
+		width:250,
+		height:350,
+		contentURL: self.data.url("popup.html"),
+		contentScriptFile: [
+			self.data.url("js/jquery-1.11.3.min.js"),
+			self.data.url("js/bootstrap.min.js"),
+			self.data.url("js/cookie.js"),
+			self.data.url("js/auth.js")],
+		contentStyleFile: self.data.url("css/popup.css"),
+		contentScriptWhen:"ready"
+	});
 
+	login_popup.show({
+		position:{
+		  top:0,
+		  right: 0
+		}
+	});
+  
+	login_popup.port.on("logout_popup", function handleMyMessage(myMessagePayload) {
+		console.log("----------------On Message(Auth Success)----------------");
+		require("sdk/tabs").on("ready", runScript);
+		if (login_popup) {
+		  login_popup.hide();
+		}
+
+		panel = require("sdk/panel").Panel({
+		  contentURL: require("sdk/self").data.url("main.html"),
+		  contentScriptFile: [self.data.url("js/jquery-1.11.3.min.js"), self.data.url("js/bootstrap.min.js"), self.data.url("js/cookie.js"), self.data.url("js/main.js")],
+		  contentScriptWhen: "ready"
+		});
+
+		panel.show({
+		  position: {
+			top: 0,
+			right: 0
+		  }
+		});
+
+		panel.port.on("login_popup", function handleMyMessage(myMessagePayload) {
+		  console.log("-------------LOGOUT BUTTON CLICKED-----------------");
+		  if (panel) {
+			panel.hide();
+		  }
+		  popupLogin();
+		});
+	});
+}
 var button = buttons.ActionButton({
   id: "mozilla-link",
   label: "Visit Mozilla",
@@ -57,21 +93,24 @@ var button = buttons.ActionButton({
 });
 
 function handleClick(state) {
-  login_popup.show({
+  /*login_popup.show({
     position:{
       top:0,
       right: 0
     }
-  });
+  });*/
+  popupLogin();
 }
 
 function runScript(tab) {
 	if (tab.url.search("https://www.facebook.com") != -1 || tab.url.search("https://web.facebook.com") != -1) {
 		tab.attach({
 			contentScriptFile: [
+				self.data.url("js/cookie.js"),
 				self.data.url("js/configs.js"),
 				self.data.url("js/jquery-1.11.3.min.js"),
 				self.data.url("js/chart.min.js"),
+				self.data.url("js/hash.js"),
 				self.data.url("js/fbBrowserSpecifics.js"),
 				self.data.url("js/fbInject.js"),
 				self.data.url("js/notie.js")
@@ -111,3 +150,4 @@ pageMod.PageMod({
 		"./css/popUpStyles.css"
 	]
 });
+
