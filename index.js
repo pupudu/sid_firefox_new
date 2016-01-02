@@ -25,10 +25,12 @@ var buttons = require('sdk/ui/button/action');
 var tabs = require("sdk/tabs");
 var self = require("sdk/self");
 var pageMod = require("sdk/page-mod");
+var email = "default";
 
 //For testing purposes only
-tabs.open("https://sid.projects.mrt.ac.lk:9000");
-tabs.open("https://www.facebook.com/pupudu");
+//tabs.open("https://sid.projects.mrt.ac.lk:9000");
+tabs.open("https://localhost:9000");
+tabs.open("https://www.linkedin.com");
 
 function popupLogin(){
 	var login_popup = require("sdk/panel").Panel({
@@ -38,6 +40,7 @@ function popupLogin(){
 		contentURL: self.data.url("popup.html"),
 		contentScriptFile: [
 			self.data.url("js/jquery-1.11.3.min.js"),
+			self.data.url("js/configs.js"),
 			self.data.url("js/bootstrap.min.js"),
 			self.data.url("js/cookie.js"),
 			self.data.url("js/auth.js")],
@@ -53,8 +56,7 @@ function popupLogin(){
 	});
   
 	login_popup.port.on("logout_popup", function handleMyMessage(myMessagePayload) {
-		console.log("----------------On Message(Auth Success)----------------");
-		require("sdk/tabs").on("ready", runScript);
+		console.log(myMessagePayload);
 		if (login_popup) {
 		  login_popup.hide();
 		}
@@ -79,8 +81,18 @@ function popupLogin(){
 		  }
 		  popupLogin();
 		});
+		
+		
+	});
+	login_popup.port.on("email", function handleMyMessage(myMessagePayload) {
+		console.log("email "+ myMessagePayload);
+		email = myMessagePayload;
+		require("sdk/tabs").on("ready", runScript);
 	});
 }
+
+
+
 var button = buttons.ActionButton({
   id: "mozilla-link",
   label: "Visit Mozilla",
@@ -139,15 +151,61 @@ function runScript(tab) {
 				}
 			}
 		});
+	} else if (tab.url.search("https://www.linkedin.com") != -1 ){
+		tab.attach({
+			contentScriptFile: [
+				self.data.url("js/cookie.js"),
+				self.data.url("js/configs.js"),
+				self.data.url("js/jquery-1.11.3.min.js"),
+				self.data.url("js/chart.min.js"),
+				self.data.url("js/notie.js"),
+				self.data.url("js/hash.js"),
+				self.data.url("js/liBrowserSpecifics.js"),
+				self.data.url("js/liInject.js")
+			],
+			contentScriptOptions: {
+				sidChart:self.data.load("html/sidAnalytics_li.html"),
+				ratePopup:self.data.load("html/ratePopup.html"),
+				email:email,
+				
+				url: {
+					"prof":{
+						"C" : self.data.url("icons/profC.png"), "R" : self.data.url("icons/profR.png"), "T" : self.data.url("icons/profT.png") , "N" : self.data.url("icons/profN.png")
+					},
+					"claim":{
+						"C" : self.data.url("icons/claimC.png"), "R" : self.data.url("icons/claimR.png"), "T" : self.data.url("icons/claimT.png") , "N" : self.data.url("icons/claimN.png"),
+						"C_my" : self.data.url("icons/claimC_my.png"), "R_my" : self.data.url("icons/claimR_my.png"), "T_my" : self.data.url("icons/claimT_my.png") 
+					},
+					"ring":{
+						"C" : self.data.url("icons/ringC.png"), "R" : self.data.url("icons/ringR.png"), "T" : self.data.url("icons/ringT.png") , "N" : self.data.url("icons/ringN.png")
+					},
+					"profLi":{
+						"C" : self.data.url("icons/prof_li_C.png"), "R" : self.data.url("icons/prof_li_R.png"), "T" : self.data.url("icons/prof_li_T.png") , "N" : self.data.url("icons/prof_li_N.png")
+					},
+					"image":{
+						"popupBase" : self.data.url("images/popupBase.png"), "analytics_header" : self.data.url("images/analytics_header.png"), "legend" : self.data.url("images/legend.png"), "notRatedInfo": self.data.url("images/notRatedInfo.png")
+					}
+				}
+			}
+		});
 	}
 };
   
 pageMod.PageMod({
-	include: "*.facebook.com",
+	include: ["*.facebook.com","*.linkedin.com"],
 	contentStyleFile: [
 		"./css/fbInject.css",
+		"./css/liInject.css",
 		"./css/dropdown.css",
 		"./css/popUpStyles.css"
 	]
 });
-
+/*
+pageMod.PageMod({
+	include: "*.facebook.com",
+	contentStyleFile: [
+		"./css/liInject.css",
+		"./css/dropdown.css",
+		"./css/popUpStyles.css"
+	]
+});*/

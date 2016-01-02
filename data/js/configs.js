@@ -1,5 +1,4 @@
 var fbstrings = {
-	sidServer:"https://sid.projects.mrt.ac.lk:9000",
 	fbTimelineHeadline:'fbTimelineHeadline',
 	sidSign:'verif',
 	profileName:'fb-timeline-cover-name',
@@ -12,14 +11,6 @@ var fbstrings = {
 	timelineClaimContainer:'_1zw6 _md0 _5vb9',
 	timelineClaim:'_50f3',
 	fbMenubar:'_6_7 clearfix',
-	rateIconContainer:'rateIconContainer',
-	popVerifiedIcon:'popVerifiedIcon',
-	popNeutralIcon:'popNeutralIcon',
-	popRefutedIcon:'popRefutedIcon',
-	popupbase:'popupbase',
-	btnVerifiedIcon:'verA',
-	btnRefutedIcon:'refA',
-	btnNeutralIcon:'neuA',
 	timelineBoxes:'timelineReportContainer',
 	timelineRecent:'pagelet_timeline_recent',
 	timelineMain:'pagelet_timeline_main_column',
@@ -32,3 +23,22 @@ var fbstrings = {
 var fbSkipStrings = ["Your friend since","Followed by","friends","Friends on","family members","Feeling","Played"];
 
 var fbNonSkipStrings = ["Works","Lives in","From","Born on","Studies","Studied", "In a relationship"];
+
+var listrings = {
+	profPic:"profile-picture",
+	mainNavBar:"nav main-nav nav-bar"
+	
+}
+
+var commonstrings = {
+	//sidServer:"https://sid.projects.mrt.ac.lk:9000",
+	sidServer:"https://localhost:9000",
+	rateIconContainer:'rateIconContainer',
+	btnVerifiedIcon:'verA',
+	btnRefutedIcon:'refA',
+	btnNeutralIcon:'neuA',
+	popVerifiedIcon:'popVerifiedIcon',
+	popNeutralIcon:'popNeutralIcon',
+	popRefutedIcon:'popRefutedIcon',
+	popupbase:'popupbase'
+}

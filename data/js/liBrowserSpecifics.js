@@ -1,12 +1,13 @@
-
 var count = 0;
 setInterval(function(){
 	console.log(count++);
-	timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
-	timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
-	removeAds();
-	identify();
+	startScript();
 },6000);
+
+/*need separate implementation for firefox and chrome*/
+function getURL(type,item){
+	return self.options.url[type.toString()][item.toString()];
+}
 
 /*need separate implementation for firefox and chrome*/
 function addSidAnalyticsMenu(){
@@ -35,7 +36,12 @@ function popUpOnIconByID(popupData){
 	configureListners(node,popupData);
 }
 
-/*need separate implementation for firefox and chrome*/
-function getURL(type,item){
-	return self.options.url[type.toString()][item.toString()];
+function getMyId(){
+	var email = self.options.email;
+	//console.log(email);
+	$.post(commonstrings.sidServer+"/rate/linkedin/getUrl",{email:email},function(data){
+		var url = data.url;
+		var id = getQueryVariable("id",url);
+		myId = id;
+	});
 }

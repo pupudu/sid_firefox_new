@@ -6,9 +6,10 @@ if(getCookie("sidSession")==="true"){
 	window.open('main.html','_self');
 }*/
 
-if(getCookie("sidSession")==="true"){	/*TODO Manipulate Cookies with a better approach*/
+if(getCookie("sidSession")){	/*TODO Manipulate Cookies with a better approach*/
 	//send message to popup the logout screen
-	self.port.emit("logout_popup", "popup logout html");
+	self.port.emit("email", getCookie("sidSession"));
+	self.port.emit("logout_popup", "login success");
 }
 
 addLoadListner();
@@ -26,7 +27,7 @@ function addLoadListner(){
 					return;
 				}
 				console.log(usr.value+" "+pwd.value);
-				$.post(fbstrings.sidServer+"/authenticate",
+				$.post(commonstrings.sidServer+"/authenticate",
 				{
 					username: usr.value,	//get value from input text field
 					password: pwd.value		//get value from input text field
@@ -36,16 +37,16 @@ function addLoadListner(){
 					if(status==="success"){
 						if(data.success){
 							console.log("Authentication success");
-							setCookie("sidSession","true",3);	//expires after 3 days if not logged out
-							injectCookie("sidSession","true",3); 	//inject to save cookie inside the main browser
+							setCookie("sidSession",usr.value,3);	//expires after 3 days if not logged out
+							injectCookie("sidSession",usr.value,3); 	//inject to save cookie inside the main browser
 							/*
 							chrome.storage.sync.set({
 								email: usr.value
 							});
 							*/
+							//self.port.emit("email", usr.value);
 							
-							
-							console.log(data);
+							//console.log(data);
 							if(data.linked===true){
 								if(data.fbid===undefined || data.fbid === ""){
 									if(data.fbappid!==undefined){
@@ -59,20 +60,20 @@ function addLoadListner(){
 												node.innerHTML=data;
 												try{
 													var fbid = node.getElementsByTagName("meta")[4].getAttribute("content").substring(13);
-													$.post(fbstrings.sidServer+"/rate/facebook/setID",
+													$.post(commonstrings.sidServer+"/rate/facebook/setID",
 													{
 														email: usr.value,	
 														uid: fbid		
 													},
 													function(data, status){
-														alert(JSON.stringify(data))
+														alert(JSON.stringify(data));
+														self.port.emit("email", usr.value);
+														self.port.emit("logout_popup", "login success");
 													});	
 												}catch(e){
+													//TODO handle issue
 													console.error(e);
 												}
-												console.log(profID);
-												//window.open('main.html','_self');
-												self.port.emit("logout_popup", "popup logout html");
 											});
 										}catch(e){
 											console.error(e);
@@ -80,14 +81,14 @@ function addLoadListner(){
 										}
 									}else{
 										//TODO : Handle issue
-										window.open('main.html','_self');
 									}
 								}else{
-									window.open('main.html','_self');
+									self.port.emit("email", usr.value);
+									self.port.emit("logout_popup", "login success");
 								}
 							}else{
 								//TODO: Handle issue
-								window.open('main.html','_self');
+								//window.open('main.html','_self');
 							}
 							//alert(JSON.stringify(data))
 							//chrome.tabs.query({url:"https://*.facebook.com/*"}, function (tabAr){
