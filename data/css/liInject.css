@@ -4,6 +4,9 @@ img.premium{
 	left:30px;
 	width:180px;
 	height:180px;
+	position:absolute;
+	z-index:1;
+	display:none;
 }
 
 canvas.drop_chart{
@@ -126,7 +129,7 @@ ul.dropElement{
 	outline-color: #bbbbdd;
 	width:250px;
 	max-width: 250px;
-	min-width: 130px;
+	min-width: 250px;
 }
 
 canvas.sid_chart{
@@ -152,9 +155,15 @@ div.Main{
 
 
 img.dropHeader{
-	width:250px;
+	width: 250px;
 }
 
+img.dropLegend{
+	width: 202px;
+    top: 50px;
+    left: 25px;
+    position: absolute;
+}
 
 
 a.verA{
@@ -193,3 +202,82 @@ li.listElement{
 	width:110px;
 }
 
+div.commentContainer{
+	padding: 15px 20px;
+    margin-top: 13px;
+    background-color: #f4f4f4;
+    border: 1px solid #e9e9e9;
+}
+
+div.commentContainer{
+	cursor:pointer;
+}
+
+li.tellUs{
+	background-color: #666;
+    color: #f77;
+}
+
+a.myButton{
+	cursor:pointer;
+}
+
+
+
+
+div.orgSlick{
+	position: absolute;
+	background-color:#dddddd;
+    top: 80px;
+    left: 25px;
+	border: 1px solid #999999;
+    height: 50px;
+    width: 200px;
+}
+
+img.carousElement{
+	background-color:#eeeefe;
+	height: 50px;
+	width: 50px;
+}
+
+img.carousElementMan{
+	background-color:#eeeefe;
+	height: 50px;
+	width: 50px;
+	position:relative;
+	left:6px;
+}
+
+div.orgSlickAct{
+	height: 52px;
+    width: 202px;
+}
+
+img.emptyCarousal{
+	height: 50px;
+    width: 200px;
+}
+
+div.sidSpace1{
+	height:40px;
+}
+
+img.orgHeader{
+	top: 50px;
+    position: absolute;
+    height: 30px;
+    width: 202px;
+    left: 25px;
+}
+
+img.slickArrowR{
+	position: absolute;
+    left: -3px;
+    width: 20px;
+}
+
+img.slickArrowL{
+	position: absolute;
+    left: 1px;
+    width: 20px;

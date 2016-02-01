@@ -29,8 +29,8 @@ var email = "default";
 
 //For testing purposes only
 //tabs.open("https://sid.projects.mrt.ac.lk:9000");
-tabs.open("https://localhost:9000");
-tabs.open("https://www.linkedin.com");
+tabs.open("https://sid.projects.mrt.ac.lk:9000");
+tabs.open("https://www.facebook.com");
 
 function popupLogin(){
 	var login_popup = require("sdk/panel").Panel({
@@ -122,13 +122,17 @@ function runScript(tab) {
 				self.data.url("js/configs.js"),
 				self.data.url("js/jquery-1.11.3.min.js"),
 				self.data.url("js/chart.min.js"),
+				self.data.url("js/z-modal.js"),
 				self.data.url("js/hash.js"),
 				self.data.url("js/fbBrowserSpecifics.js"),
 				self.data.url("js/fbInject.js"),
-				self.data.url("js/notie.js")
+				self.data.url("js/notie.js"),
+				self.data.url("js/z-modal.js"),
+				self.data.url("js/slick.js")
 			],
 			contentScriptOptions: {
 				sidChart:self.data.load("html/sidAnalytics.html"),
+				comment:self.data.load("html/comment.html"),
 				ratePopup:self.data.load("html/ratePopup.html"),
 				
 				url: {
@@ -146,7 +150,13 @@ function runScript(tab) {
 						"C" : self.data.url("icons/prof_li_C.png"), "R" : self.data.url("icons/prof_li_R.png"), "T" : self.data.url("icons/prof_li_T.png") , "N" : self.data.url("icons/prof_li_N.png")
 					},
 					"image":{
-						"popupBase" : self.data.url("images/popupBase.png"), "analytics_header" : self.data.url("images/analytics_header.png"), "legend" : self.data.url("images/legend.png"), "notRatedInfo": self.data.url("images/notRatedInfo.png")
+						"popupBase" : self.data.url("images/popupBase.png"), 
+						"analytics_header" : self.data.url("images/analytics_header.png"), 
+						"legend" : self.data.url("images/legend.png"), 
+						"notRatedInfo": self.data.url("images/notRatedInfo.png"),
+						"comment": self.data.url("images/comment.png"),
+						"left": self.data.url("images/left.png"),
+						"right": self.data.url("images/right.png")
 					}
 				}
 			}
@@ -192,20 +202,25 @@ function runScript(tab) {
 };
   
 pageMod.PageMod({
-	include: ["*.facebook.com","*.linkedin.com"],
+	include: ["*.linkedin.com"],
 	contentStyleFile: [
 		"./css/fbInject.css",
 		"./css/liInject.css",
 		"./css/dropdown.css",
-		"./css/popUpStyles.css"
+		"./css/popUpStyles.css",
+		"./css/z-modal.css"
 	]
 });
-/*
+
 pageMod.PageMod({
 	include: "*.facebook.com",
 	contentStyleFile: [
-		"./css/liInject.css",
+		"./css/fbInject.css",
 		"./css/dropdown.css",
-		"./css/popUpStyles.css"
+		"./css/popUpStyles.css",
+		"./css/z-modal.css",
+		"./css/slick-theme.css",
+		"./css/slick.css"
 	]
-});*/
+});
+

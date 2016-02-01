@@ -1,6 +1,5 @@
-/* globals Chart,fbstrings,commonstrings,notie,fbSkipStrings,addSidAnalyticsMenu,fbNonSkipStrings,getURL,hex_md5,popUpOnIconByID: false */
-
-//console.log();
+/* globals Chart,fbstrings,commonstrings,notie,fbSkipStrings,addSidAnalyticsMenu,fbNonSkipStrings,getURL,hex_md5,popUpOnIconByID,addCommentSection,sendAjaxOverHttp,ZMODAL: false */
+/* exported processAnalyticsHTML,configureListners,processCommentsHTML */
 
 var timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
 var timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
@@ -23,22 +22,27 @@ function identify(){
 		
 		updateProfPic(false);
 		addSidAnalyticsMenu();
+		addCommentSection("getComments");
 		
 		if(selectedTab.indexOf("About") === 0) {
-			var subsection = document.getElementsByClassName(fbstrings.subSection)[0].innerHTML;
-			if(subsection.indexOf("Work and Education") ===0 ){
-				//manipulateAboutWork();		
-				manipulateAbout(fbstrings.workClaim,"Work");
-			}				
-			else if(subsection.indexOf("Life Events") ===0 ){
-				//manipulateLifeEvents();		
-				manipulateAbout(fbstrings.lifeEventClaim,"Events");
+			var subSectionHolder = document.getElementsByClassName(fbstrings.subSection)[0];
+			if(subSectionHolder){
+				var subsection = subSectionHolder.innerHTML;
+				if(subsection.indexOf("Work and Education") ===0 ){
+					//manipulateAboutWork();		
+					manipulateAbout(fbstrings.workClaim,"Work");
+				}				
+				else if(subsection.indexOf("Life Events") ===0 ){
+					//manipulateLifeEvents();		
+					manipulateAbout(fbstrings.lifeEventClaim,"Events");
+				}
+				else if(subsection.indexOf("Overview") ===0 ){
+					//manipulateOverview();
+					manipulateAbout(fbstrings.lifeEventClaim,"Overview");
+				}
+			}else{
+				console.log("Unable to access About subsection");
 			}
-			else if(subsection.indexOf("Overview") ===0 ){
-				//manipulateOverview();
-				manipulateAbout(fbstrings.lifeEventClaim,"Overview");
-			}
-			
 		}else if (selectedTab.indexOf("Timeline") === 0){
 			console.log("selectedTab: "+ selectedTab);
 			manipulateTimeLine();	
@@ -57,31 +61,26 @@ function updateProfPic(manual){
 			return;
 		}
 	}
-	console.log(".. .. updating profile pic");
-	var profPic = document.getElementsByClassName(fbstrings.photoContainer)[0];
-	var icon = document.createElement("DIV");
-	var imgURL;
 	var profID = extractId(1);
-	icon.innerHTML = "<img id ="+fbstrings.sidSign+" class = 'profIcon'>";
-	profPic.appendChild(icon);
 	
-	$.post(commonstrings.sidServer+"/rate/facebook/getOverallProfileRating",
-	{
-		targetid: profID	
-	},
-	function(data){
-		console.log(data);
-		imgURL = getURL("prof",data.ratingLevel);
+	var postExecute = function (data){
+		var imgURL = getURL("prof",data.ratingLevel);
+		var icon = document.createElement("DIV");
+		var profPic = document.getElementsByClassName(fbstrings.photoContainer)[0];
+		icon.innerHTML = "<img id ="+fbstrings.sidSign+" class = 'profIcon'>";
+		profPic.appendChild(icon);
+		
 		if(document.getElementById(fbstrings.sidSign) !== null){
 			document.getElementById(fbstrings.sidSign).src = imgURL;
 		}
 		$("#"+fbstrings.sidSign).fadeIn(2000);
-	});
+	};
+	
+	sendAjax("POST","/rate/facebook/getOverallProfileRating",{targetid: profID},postExecute);
 }
 
-/** Appends sid-rating state over fb profile picture*/
+/**updating friends profile pics*/
 function updFrndsProfInTimeLine(){
-	/**updating friends profile pics*/
 	var timelineRecent = document.getElementById(fbstrings.timelineRecent);
 	var friendAr = timelineRecent.getElementsByClassName(fbstrings.friendProfiles);
 	var altAr = document.getElementsByClassName("_3s6w");
@@ -103,15 +102,12 @@ function updFrndsProfInTimeLine(){
 }
 
 function addIconToFriendProf(profID, friendStr){
+	var postExecute = function(data){
+		var imgURL = getURL("prof",data.ratingLevel);
+		document.getElementById(friendStr).src = imgURL;
+	};
 	try{
-		$.post(commonstrings.sidServer+"/rate/facebook/getOverallProfileRating",
-		{
-			targetid: profID	
-		},
-		function(data){
-			var imgURL = getURL("prof",data.ratingLevel);
-			document.getElementById(friendStr).src = imgURL;
-		});
+		sendAjax("POST","/rate/facebook/getOverallProfileRating",{targetid: profID},postExecute);
 	}catch(e){
 		var imgURL = getURL("prof","N");
 		document.getElementById(friendStr).src = imgURL;
@@ -139,45 +135,216 @@ function manipulateTimeLine(){
 	}
 }
 
-function processAnalyticsHTML(data){
+function processAnalyticsHTML(html){
 	console.log(".. .. .. adding sid analytics pop up menu");
 	var node = document.createElement("DIV");  
-	node.innerHTML = data;
+	node.innerHTML = html;
 	document.getElementsByClassName(fbstrings.fbMenubar)[0].appendChild(node);
 	
-	var profId = extractId(1);
+	var targetId = extractId(1);
+	var myId = extractId(0);
 	var headerURL = getURL("image","analytics_header");
 	var legendURL = getURL("image","legend");
 	
 	document.getElementById("analytics_header").src = headerURL;
 	document.getElementById("analytics_legend").src = legendURL;
 	
-	commitDropdownChart(profId,node);
+	var postExecute = function (data){
+		var organizations;
+		var suppCount = 0;
+		if(data){
+			organizations = data.organizations;
+		}
+		if(organizations){
+			suppCount = organizations.length;
+		}
+
+		if(suppCount === 0){
+			var orgNode = document.createElement("img");
+			orgNode.className = "emptyCarousal";
+			orgNode.src = getURL("image","notMember");
+			document.getElementsByClassName("orgSlick")[0].appendChild(orgNode);
+		}else if(suppCount<4){
+			organizations.forEach(function(org){
+				var orgNode = document.createElement("img");
+				orgNode.style.left = 25*(4-suppCount) + "px";
+				orgNode.className = "carousElementMan";
+				orgNode.src = commonstrings.sidServerHttp+"/organizations/"+org+".png";
+				orgNode.addEventListener('click',function(){
+					window.open(commonstrings.sidServerHttp+"/organizations/"+org);
+				});
+				document.getElementsByClassName("orgSlick")[0].appendChild(orgNode);
+			});
+		}else{
+			organizations.forEach(function(org){
+				var orgNode = document.createElement("img");
+				orgNode.className = "carousElement";
+				orgNode.src = commonstrings.sidServerHttp+"/organizations/"+org+".png";
+				document.getElementsByClassName("orgSlick")[0].className += " orgSlickAct";
+				orgNode.addEventListener('click',function(){
+					window.open(commonstrings.sidServerHttp+"/organizations/"+org);
+				});
+				document.getElementsByClassName("orgSlick")[0].appendChild(orgNode);
+			});
+			$('.orgSlick').slick({
+				infinite: true,
+				slidesToShow: 2,
+				slidesToScroll: 1,
+				autoplay: true,
+				centerMode:true
+			});
+			var rArrow = document.createElement("img");
+			var lArrow = document.createElement("img");
+			rArrow.className = "slickArrowR";
+			lArrow.className = "slickArrowL";
+			rArrow.src = getURL("image","right");
+			lArrow.src = getURL("image","left");
+			document.getElementsByClassName("slick-next")[0].appendChild(rArrow);
+			document.getElementsByClassName("slick-prev")[0].appendChild(lArrow);
+		}
+	};
+	
+	sendAjax("POST","/rate/facebook/getMyOrganizations",{myid: targetId},postExecute);
+	commitDropdownChart(targetId,node);
+	
+	sendAjax("POST","/rate/facebook/getLinkedInUrl",{
+		uid: targetId
+	},function(data){
+		if(data.success === true){
+			document.getElementById("li_nav").href=data.linkedinUrl;
+		}else{
+			document.getElementById("li_nav").addEventListener('click',function(){
+				notie.alert(3, 'Facebook profile not connected!', 3);
+			});
+		}
+	});
 	
 	try{
-		$.post(commonstrings.sidServer+"/test/getLinkedinURL",{
-			uid : profId
-		},
-		function(data){
-			document.getElementById("li_nav").href=data.url;
-		});
+		processCommentPopup(targetId,myId,undefined,"getComments");
 	}catch(e){
-		document.getElementById("li_nav").addEventListener('click',function(){
-			notie.alert(3, 'Linked In profile not connected', 3);
-		});
+		console.error(e);
 	}
 }
 
+function processCommentsHTML(html,type){
+	
+	var targetId = extractId(1);
+	var myId = extractId(0);
+	var timeline = document.getElementsByClassName("fbTimelineCapsule clearfix")[0];
+	if(!timeline){
+		return;
+	}
+	var firstChild = timeline.firstChild;
+	var node = document.createElement("div");
+	
+	timeline.insertBefore(node,firstChild);
+	node.outerHTML = html;
+	
+	document.getElementById("commentIcon").src = getURL("image","comment");
+	
+	document.getElementById("sidCommentCloseButton").addEventListener("click",function(){
+		document.getElementById("viewAllComments").remove();
+	});
+	
+	processCommentPopup(targetId,myId,"selectedComment",type);
+}
+
+function processCommentPopup(targetId,myId,btnOptional,type,popupData){
+	console.log("vieweing comments");
+	var claimId;
+	if(popupData){
+		claimId = hex_md5(popupData.claim.getAttribute("data-html").toLowerCase());
+	}	
+	var emptyComment = "No profile comments available. Be the first to comment on this profile";
+	var postExecute = function(data){
+		if(document.getElementById("sidComment")){
+			emptyComment = "No profile comments available. Be the first to comment on this profile";
+			options.title = "Profile Reviews";
+			var comment;
+			if(data.comments[data.comments.length -1]){
+				comment = data.comments[data.comments.length -1].comment;
+			}else{
+				comment = emptyComment;
+			}
+			if(comment.length > 72){
+				comment = comment.substring(0,70) + " (...)";
+			}
+			document.getElementById("sidComment").textContent = comment;
+		}
+	};
+	sendAjax("POST","/rate/facebook/getComments",{targetid : targetId,myid: myId},postExecute);
+	
+	var options = {
+		title: "sid Comments",
+		content: emptyComment,
+		input:true,
+		buttons: [
+			{
+				label: "Close",
+				id:"closeModal",
+				func:"close",
+				half: true
+			},
+			{
+				label: "Add Comment",
+				id:"addCommentBtn",
+				func:"addComment",
+				half: true,
+				type: type,
+				network: "facebook",
+				claimid: claimId,
+				myId: myId,
+				targetId: targetId,
+				popupData: popupData
+			}
+		],
+		autoload: false
+	};
+	var btn = document.getElementById("view-comment-btn");
+	if(btnOptional){
+		btn = document.getElementById(btnOptional);
+	}
+	
+	var new_element = btn.cloneNode(true);
+	btn.parentNode.replaceChild(new_element, btn);
+	
+	btn = document.getElementById("view-comment-btn");
+	if(btnOptional){
+		btn = document.getElementById(btnOptional);
+	}
+	
+	btn.addEventListener('click', function(){
+		var postExecute = function(data){
+			var content="";
+			console.log(data);
+			for(var i=0;i<data.comments.length;i++){
+				content = content+"Comment "+i+": "+data.comments[i].comment+"<br>";
+				if(data.comments[i].mysid === myId){
+					options.buttons[1].label = "Update Comment";
+				}
+			}
+			if(type === "getClaimComments"){
+				emptyComment = "No claim comments available. Be the first to comment on this claim";
+				options.title = "Claim: " + popupData.claim.getAttribute("data-html");
+			}
+			if(content === ""){
+				content = emptyComment;
+			}
+			options.content = content;
+			var modal = new ZMODAL(options);
+			modal.open();
+		};
+		sendAjax("POST","/rate/facebook/"+type,{targetid : targetId,myid: myId, claimid: claimId},postExecute);
+	});
+}
+
+
 function commitDropdownChart(profId,node){
-	$.post(commonstrings.sidServer+"/rate/facebook/getAllRatingsCount",{
-		targetid : profId
-	},
-	function(rating /*,status*/){
-		//console.log(rating);
+	var postExecute = function (data){
 		var chartData = {};
-		chartData.yesCount = rating.yes;
-		chartData.noCount = rating.no;
-		chartData.notSureCount = rating.notSure;
+		chartData.yesCount = data.yes;
+		chartData.noCount = data.no;
+		chartData.notSureCount = data.notSure;
 		
 		var chartConfigs = {};
 		chartConfigs.animation = true;
@@ -185,27 +352,32 @@ function commitDropdownChart(profId,node){
 		chartConfigs.base = "_9ry _p";
 		
 		addChartListener(chartData,chartConfigs,node);
-	});
+	};
+	sendAjax("POST","/rate/facebook/getAllRatingsCount",{targetid : profId},postExecute);
 }
+
+
 
 function scoreClaims(arrIndex, claim, classOffset){
 
-	var targetId = extractId(1);
-	var myId = extractId(0);
 	var rateIcon = document.createElement("DIV");
-	var iconId = 'claimR'+classOffset+arrIndex;
+	var iconId = 'claim'+classOffset+arrIndex;
 	var iconClass = 'claim';
-	var claimScore = 'T';
-	
-	if(classOffset === "" || classOffset === "Overview"){
-		if(clearIconsIfSkip(claim)){
-			return;
-		}
+
+	if(clearIconsIfSkip(claim)){
+		return;
 	}
 	
 	/*Avoid adding icons again if already added*/
 	if(claim.getAttribute("data-html")===null){
-		var html = claim.innerHTML.replace(/web./g,"www.");
+		var html;
+		if(classOffset === "Events"){
+			html = claim.getElementsByClassName("_c24 _50f4")[0].innerHTML.replace(/web./g,"www.");
+		}else{
+			html = claim.innerHTML.replace(/web./g,"www.");
+		}
+		html = html.replace("Also ","");
+		html = html.substr(0,1).toUpperCase() + html.substr(1);
 		claim.setAttribute("data-html",html);
 	}
 	if(claim.getElementsByClassName(commonstrings.rateIconContainer).length === 0){
@@ -217,27 +389,31 @@ function scoreClaims(arrIndex, claim, classOffset){
 		return;
 	}
 	
-	var claimId = hex_md5(claim.getAttribute("data-html"));
+	var claimId = hex_md5(claim.getAttribute("data-html").toLowerCase());
 	
-	try{
-	$.post(commonstrings.sidServer+"/rate/facebook/getRating",{
-		targetid : targetId,
-		claimid : claimId,
-		myid : myId
-	},
-	function(data){
-		
-		claimScore = data.claimScore;
-		var imgURL = getURL(iconClass,claimScore);
+	performScoring(iconId,iconClass,claimId,claim,classOffset);		
+	
+}
+
+function performScoring(iconId,iconClass,claimId,claim,classOffset){
+	var targetId = extractId(1);
+	var myId = extractId(0);
+	var popupData={};
+	
+	popupData.claim = claim;
+	popupData.iconId = iconId;
+	popupData.iconClass = iconClass;
+	popupData.classOffset = classOffset;
+	popupData.yes = 1;
+	popupData.no = 1;
+	popupData.notSure = 1;
+	popupData.myRating = -10;
+	
+	var postExecute = function (data){
+		var imgURL = getURL(iconClass,data.claimScore);
 		var icon = document.getElementById(iconId);
 		if(icon!==null){
 			icon.src = imgURL;
-			
-			var popupData={};
-			popupData.claim = claim;
-			popupData.iconId = iconId;
-			popupData.iconClass = iconClass;
-			popupData.classOffset = classOffset;
 			popupData.yes = data.yes;
 			popupData.no = data.no;
 			popupData.notSure = data.notSure;
@@ -248,24 +424,15 @@ function scoreClaims(arrIndex, claim, classOffset){
 		else{
 			console.log("info .. .. .. Icons already added");
 		}
-	});
+	};
+	
+	try{
+		sendAjax("POST","/rate/facebook/getRating",{targetid : targetId, claimid : claimId,	myid : myId	},postExecute);
 	}catch(e){
-		
 		var imgURL = getURL(iconClass,"N");
 		var icon = document.getElementById(iconId);
 		if(icon!==null){
 			icon.src = imgURL;
-			
-			var popupData={};
-			popupData.claim = claim;
-			popupData.iconId = iconId;
-			popupData.iconClass = iconClass;
-			popupData.classOffset = classOffset;
-			popupData.yes = 1;
-			popupData.no = 1;
-			popupData.notSure = 1;
-			popupData.myRating = -10;
-			
 			popUpOnIconByID(popupData);
 		}
 	}
@@ -277,30 +444,20 @@ function processRatepopup(node,myRating){
 	var refuted = node.getElementsByClassName(commonstrings.popRefutedIcon);
 	var popupBase = node.getElementsByClassName(commonstrings.popupbase);
 	
-	var R = "R";
-	var C = "C";
-	var T = "T";
-	switch(myRating){
-		case -1:
-			R = R + "_my";
-			break;
-		case 0:
-			C = C + "_my";
-			break;
-		case 1:
-			T = T + "_my";
-			break;
-		case -10:
-			//console.error("claim not rated by me");
-			break;
-		default:
-			//console.error("Unexpected my rating value" + myRating);
-			break;
-	}
+	var score = {"-1": "R", 1: "T" , 0: "C"};
+	var texts = {"-1": "I Reject", 1: "I Approve" , 0: "No Idea"};
+	var updates = {"-1": "I Rejected", 1: "I Approved" , 0: "No Idea"};
 	
-	var verImgUrl = getURL("claim",T);
-	var neuImgUrl = getURL("claim",C);
-	var refImgUrl = getURL("claim",R);
+	score[myRating] = score[myRating] + "_my";
+	texts[myRating] = updates[myRating];
+	
+	node.getElementsByClassName("refA")[0].textContent = texts["-1"];
+	node.getElementsByClassName("verA")[0].textContent = texts[1];
+	node.getElementsByClassName("neuA")[0].textContent = texts[0];
+	
+	var verImgUrl = getURL("claim",score[1]);
+	var neuImgUrl = getURL("claim",score[0]);
+	var refImgUrl = getURL("claim",score["-1"]);
 	var baseImgUrl = getURL("image","popupBase");
 	
 	verified[0].src = verImgUrl;
@@ -314,6 +471,7 @@ function configureListners(node,popupData){
 	addEventToSendData(node,commonstrings.btnVerifiedIcon,popupData,1);
 	addEventToSendData(node,commonstrings.btnRefutedIcon,popupData,-1);
 	addEventToSendData(node,commonstrings.btnNeutralIcon,popupData,0);
+	addEventToShowComments(popupData);
 	
 	var chartData = {};
 	chartData.yesCount = popupData.yes;
@@ -328,9 +486,19 @@ function configureListners(node,popupData){
 	addChartListener(chartData,chartConfigs,popupData.claim);
 }
 
+function addEventToShowComments(popupData){
+	var reviewBtn = popupData.claim.getElementsByClassName("reviewElement")[0];
+	var targetId = extractId(1);
+	var myId = extractId(0);
+	var claimId = hex_md5(popupData.claim.getAttribute("data-html").toLowerCase());
+	reviewBtn.id = "claimComment" + claimId;
+	processCommentPopup(targetId,myId,reviewBtn.id,"getClaimComments",popupData);
+	//reviewBtn.click();
+}
+
 function addEventToSendData(node,menuItemName,popupData,rate){
 	
-	var claimId = hex_md5(popupData.claim.getAttribute("data-html"));
+	var claimId = hex_md5(popupData.claim.getAttribute("data-html").toLowerCase());
 	var menuItem =  popupData.claim.getElementsByClassName(menuItemName)[0];
 	var targetId = extractId(1);
 	var myId = extractId(0);
@@ -339,15 +507,8 @@ function addEventToSendData(node,menuItemName,popupData,rate){
 
 		notie.alert(4, 'Adding rating to siD system', 2);
 		var claimData = popupData.claim.getAttribute("data-html");
-		$.post(commonstrings.sidServer+"/rate/facebook/addRating",{
-			myid: myId,
-			targetid: targetId,
-			claimid: claimId,
-			claim: claimData,
-			rating: rate
-		},
-		function(data){
-			
+		
+		var postExecute = function(data){
 			if(data.success !== true){
 				setTimeout(function(){
 					notie.alert(3, 'An unexpected error occured! Please Try Again', 3);
@@ -359,13 +520,36 @@ function addEventToSendData(node,menuItemName,popupData,rate){
 					console.log("Rating added successfully");
 					updateProfPic(true);
 				},1000);
-				$.post(commonstrings.sidServer+"/rate/facebook/getRating",{
-					targetid : targetId,
-					myid: myId,
-					claimid : claimId
-				},function(data){
-					console.log(data);
+				
+				var postExecute = function(data){
+					
 					processRatepopup(node,data.myrating);
+					var inputHolder = popupData.claim.getElementsByClassName("hiddenInput")[0];
+					if(!inputHolder){
+						inputHolder = popupData.claim.getElementsByClassName("shownInput")[0];
+					}else{
+						inputHolder.className = "shownInput";
+					}
+					var input = popupData.claim.getElementsByClassName("comment")[0];
+					if(input){
+						$(input).keyup(function (e) {
+							if (e.keyCode == 13) {
+								var comment = input.value;
+								var commentId = hex_md5(comment);
+								sendAjax("POST","/rate/facebook/addComment",{
+									targetid:targetId,
+									myid:myId,
+									commentid:commentId,
+									comment:comment,
+									claimid:claimId
+								},function(){
+									notie.alert(1, 'Comment added successfully!', 3);
+									inputHolder.className = "hiddenInput";
+								});
+							}
+						});
+					}
+					
 					var chartData = {};
 					chartData.yesCount = data.yes;
 					chartData.noCount = data.no;
@@ -380,12 +564,15 @@ function addEventToSendData(node,menuItemName,popupData,rate){
 					document.getElementById(popupData.iconId).src=imgURL;
 					drawPieChart(chartData,chartConfigs,popupData.claim);
 					addChartListener(chartData,chartConfigs,popupData.claim);
-				});
+				};
+				
+				sendAjax("POST","/rate/facebook/getRating",{targetid : targetId, claimid : claimId,	myid : myId	},postExecute);
 				
 				var dropdown = document.getElementsByClassName("sid_dropdown")[0];
 				commitDropdownChart(targetId,dropdown);
 			}
-		});
+		};
+		sendAjax("POST","/rate/facebook/addRating",{targetid : targetId, claimid : claimId,	myid : myId, claim: claimData, rating: rate	},postExecute);
 	});
 }
 
@@ -499,6 +686,7 @@ function hashIds(str){
 function addChartListener(chartData,chartConfigs,parent){
 	var sidDropdown = parent.getElementsByClassName(chartConfigs.base)[0];
 	console.log(chartConfigs.base+".............."+sidDropdown);
+	drawPieChart(chartData,chartConfigs,parent);
 	sidDropdown.addEventListener('mouseover', function() {
 		if(document.getElementsByClassName("ego_section").length>0){
 			document.getElementsByClassName("ego_section")[0].remove();
@@ -525,13 +713,13 @@ function drawPieChart(chartData,chartConfigs,parent){
 			value: verified,
 			color: "#46BF7D",
 			highlight: "#5AD391",
-			label: "Verified"
+			label: "Approved"
 		},
 		{
 			value: uncertain,
 			color: "#FDB45C",
 			highlight: "#FFC870",
-			label: "Uncertain"
+			label: "Not Sure"
 		}
 	];
 	
@@ -539,25 +727,35 @@ function drawPieChart(chartData,chartConfigs,parent){
 	chartHolder.firstChild.remove();
 	chartHolder.innerHTML = '<canvas class='+chartConfigs.type+'_chart'+'></canvas>';
 
-	var ctx = parent.getElementsByClassName(chartConfigs.type+'_chart')[0].getContext("2d");
-	if(total>0){
-		try{
-			var myPie;
-			myPie = new Chart(ctx).Pie(pieData,{
-				animation: chartConfigs.animation,
-				animationEasing: "easeInOutQuart",
-				segmentStrokeColor : "#ffffff"
-				//add more chart configs here as needed
-			});
-		}catch(err){
-			console.log(err);
+	try{
+		var ctx = parent.getElementsByClassName(chartConfigs.type+'_chart')[0].getContext("2d");
+		if(total>0){
+			try{
+				var myPie;
+				myPie = new Chart(ctx).Pie(pieData,{
+					animation: chartConfigs.animation,
+					animationEasing: "easeInOutQuart",
+					segmentStrokeColor : "#ffffff"
+					//add more chart configs here as needed
+				});
+			}catch(err){
+				console.log("sid error: "+err);
+			}
+		}else{
+			try{
+				var imgUrl = getURL("image","notRatedInfo");
+				//var imgUrl = commonstrings.sidServer+"/organizations/uni_sl_uom.png";
+				var base_image = new Image();
+				base_image.src = imgUrl;
+				ctx.drawImage(base_image,0,0,300,150);
+			}catch(err){
+				console.log("sid error: "+err);
+			}
 		}
-	}else{
-		var imgUrl = getURL("image","notRatedInfo");
-		var base_image = new Image();
-		base_image.src = imgUrl;
-		ctx.drawImage(base_image,0,0,300,150);
+	}catch(err){
+		console.log("sid error: "+err);
 	}
+		
 }
 
 function getQueryVariable(variable,string) {
@@ -571,4 +769,21 @@ function getQueryVariable(variable,string) {
         }
     }
     return null;
+}
+
+function sendAjax(type,url,data,postExecute,onError){
+	$.ajax(commonstrings.sidServer+url,{
+		method: type,
+		data: data,
+		success: function(data){
+			postExecute(data);
+		},
+		error: function(){
+			if(onError){
+				onError();
+			}else{
+				sendAjaxOverHttp('POST',commonstrings.sidServerHttp+url,data,postExecute);
+			}
+		}
+	});
 }

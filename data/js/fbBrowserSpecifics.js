@@ -1,12 +1,12 @@
+/*need separate implementation for firefox and chrome*/
+function getURL(type,item){
+	return self.options.url[type.toString()][item.toString()];
+}
 
-var count = 0;
-setInterval(function(){
-	console.log(count++);
-	timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
-	timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
-	removeAds();
-	identify();
-},6000);
+
+
+
+
 
 /*need separate implementation for firefox and chrome*/
 function addSidAnalyticsMenu(){
@@ -16,6 +16,10 @@ function addSidAnalyticsMenu(){
 		}
 	},1000);
 }
+
+
+
+
 
 /*needs a separate implementations for firefox and chrome*/
 function popUpOnIconByID(popupData){ 
@@ -35,7 +39,21 @@ function popUpOnIconByID(popupData){
 	configureListners(node,popupData);
 }
 
-/*need separate implementation for firefox and chrome*/
-function getURL(type,item){
-	return self.options.url[type.toString()][item.toString()];
+
+
+function addCommentSection(type){
+	setTimeout(function(){
+		if(document.getElementById('viewAllComments') === null){
+			processCommentsHTML(self.options.comment,type);
+		}
+	},1000);
 }
+
+var count = 0;
+setInterval(function(){
+	console.log(count++);
+	timeLineCName = document.getElementById(fbstrings.profileName);		//element to identify fb profile
+	timeLineHLine = document.getElementById(fbstrings.fbTimelineHeadline);			//element to identify fb page
+	removeAds();
+	identify();
+},6000);

@@ -3,17 +3,18 @@ var vieweeId;
 var myId;
 
 function startScript(){
-	vieweeId = getVieweeId();
+	getVieweeId();
 	getMyId();
-	if(document.getElementsByClassName("preview-profile button-primary").length===0){
-		check();
-	}
+	/*if(document.getElementsByClassName("preview-profile button-primary").length===0){
+		//check();
+	}*/
 }
-
+/*
 function check(){
+	console.log(myId);
 	checkCounter++;
-	if(checkCounter > 10){
-		alert("Error getting linked ID. Make sure that you have connected your linkedin profile using the sid Website and try again.(This message will be shown 3 times)");
+	if(checkCounter > 20){
+		console.log("Error getting linked ID. Make sure that you have connected your linkedin profile using the sid Website and try again.(This message will be shown 3 times)");
 		return;
 	}
 	setTimeout(function(){
@@ -23,19 +24,22 @@ function check(){
 			manipulate();
 		}
 	},500);
-}
+}*/
 
 function manipulate(){
-	console.log(myId);
 	updateProfPic();
 	addSidAnalyticsMenu();
 	manipulateProfile();
+	addCommentSection("getComments");
 }
 
 /** Returs the id of the profile being viewed*/
 function getVieweeId(){
-	return document.getElementsByClassName("profile-overview-content")[0].firstChild.id.replace("member-","");
+	//return document.getElementsByClassName("profile-overview-content")[0].firstChild.id.replace("member-","");
+	vieweeId = document.getElementsByClassName("view-public-profile")[0].innerText;
+	vieweeId = vieweeId.replace("https://lk.linkedin.","https://www.linkedin.");
 }
+
 
 function getQueryVariable(variable,string) {
     var qId = string.indexOf("?");
@@ -51,33 +55,49 @@ function getQueryVariable(variable,string) {
 }
 
 /** Appends sid-rating state over fb profile picture*/
-function updateProfPic(){
-	if(document.getElementById("verif")!==null){
-		if(document.getElementById("verif").src.length>10){
-			console.log(".. .. Profile pic already updated");
-			return;
+function updateProfPic(ismanual){
+	if(!ismanual){
+		if(document.getElementById("verif")!==null){
+			if(document.getElementById("verif").src.length>10){
+				console.log(".. .. Profile pic already updated");
+				return;
+			}
 		}
 	}
 	var profPic = document.getElementsByClassName(listrings.profPic)[0];
 	var icon = document.createElement("DIV");
-	var accType="free";
+	/*var accType="profIcon";
 
 	if(document.getElementsByClassName("premiumicon").length>0){
 		accType="premium";
-	}
-	icon.innerHTML = "<img id ='verif' class = 'profIcon "+accType+"'>";
+	}*/
+	icon.innerHTML = "<img id ='verif'>";
 	profPic.appendChild(icon);
+	
+	var sidIcon = document.getElementById('verif');
+	var profPicImg = document.getElementsByClassName("profile-picture")[0].children[0];
+	var css = window.getComputedStyle(profPicImg);
+	var parentCss = window.getComputedStyle(profPicImg.parentNode);
+	
+	sidIcon.style.position = "absolute";
+	sidIcon.style.left = (parentCss.width.toString().substring(0,3) - css.width.toString().substring(0,3))/2+"px";
+	sidIcon.style.top = (parentCss.width.toString().substring(0,3) - css.height.toString().substring(0,3))/2+"px";
+	sidIcon.style.width = css.width;
+	sidIcon.style.height = css.height;
+	
+	
 	
 	$.post(commonstrings.sidServer+"/rate/linkedin/getOverallProfileRating",
 	{
 		targetid: vieweeId	
 	},
 	function(data/*, status*/){
-		if(data.rating === undefined){
-			data.rating = "N";
-			console.error("Overall Profile Rating undefined, replaced with N");
+		console.log(data);
+		if(data.ratingLevel === undefined){
+			data.ratingLevel = "N";
+			console.error("Overall Profile RatingLevel undefined, replaced with N");
 		}
-		var imgURL = getURL("prof_li_",data.rating);
+		var imgURL = getURL("prof_li_",data.ratingLevel);
 		if(document.getElementById('verif') !== null){
 			document.getElementById('verif').src = imgURL;
 		}
@@ -123,26 +143,198 @@ function processAnalyticsHTML(data){
 	document.getElementsByClassName(listrings.mainNavBar)[0].appendChild(node);
 	node.outerHTML = data;
 	
-	var headerURL = getURL("image","analytics_header");
-	var legendURL = getURL("image","legend");
+	var headerURL = getURL("image","analytics_header_li");
+	var legendURL = getURL("image","legend_li");
 	
 	document.getElementById("analytics_header").src = headerURL;
 	document.getElementById("analytics_legend").src = legendURL;
 	
+	
+	var postExecute = function (data){
+		console.log(data);
+		var organizations;
+		var suppCount = 0;
+		if(data){
+			organizations = data.organizations;
+		}
+		if(organizations){
+			suppCount = organizations.length;
+		}
+
+		if(suppCount === 0){
+			var orgNode = document.createElement("img");
+			orgNode.className = "emptyCarousal";
+			orgNode.src = getURL("image","notMember");
+			document.getElementsByClassName("orgSlick")[0].appendChild(orgNode);
+		}else if(suppCount<4){
+			organizations.forEach(function(org){
+				var orgNode = document.createElement("img");
+				orgNode.style.left = 25*(4-suppCount) + "px";
+				orgNode.className = "carousElementMan";
+				orgNode.src = commonstrings.sidServerHttp+"/organizations/"+org+".png";
+				orgNode.addEventListener('click',function(){
+					window.open(commonstrings.sidServerHttp+"/organizations/"+org);
+				});
+				document.getElementsByClassName("orgSlick")[0].appendChild(orgNode);
+			});
+		}else{
+			organizations.forEach(function(org){
+				var orgNode = document.createElement("img");
+				orgNode.className = "carousElement";
+				orgNode.src = commonstrings.sidServerHttp+"/organizations/"+org+".png";
+				document.getElementsByClassName("orgSlick")[0].className += " orgSlickAct";
+				orgNode.addEventListener('click',function(){
+					window.open(commonstrings.sidServerHttp+"/organizations/"+org);
+				});
+				document.getElementsByClassName("orgSlick")[0].appendChild(orgNode);
+			});
+			$('.orgSlick').slick({
+				infinite: true,
+				slidesToShow: 2,
+				slidesToScroll: 1,
+				autoplay: true,
+				centerMode:true
+			});
+			var rArrow = document.createElement("img");
+			var lArrow = document.createElement("img");
+			rArrow.className = "slickArrowR";
+			lArrow.className = "slickArrowL";
+			//rArrow.src = getURL("image","right");
+			//lArrow.src = getURL("image","left");
+			document.getElementsByClassName("slick-next")[0].appendChild(rArrow);
+			document.getElementsByClassName("slick-prev")[0].appendChild(lArrow);
+		}
+	};
+	
+	sendAjax("POST","/rate/facebook/getMyOrganizations",{myid: vieweeId},postExecute);
+	
+	
 	commitDropdownChart(vieweeId,document);
 	
+	sendAjax("POST","/rate/linkedin/getFacebookUrl",{
+		uid: vieweeId
+	},function(data){
+		if(data.success === true){
+			document.getElementById("li_nav").target = "_blank";
+			document.getElementById("li_nav").href=data.facebookUrl;
+		}else{
+			document.getElementById("li_nav").addEventListener('click',function(){
+				notie.alert(3, 'Facebook profile not connected!', 3);
+			});
+		}
+	});
+	
 	try{
-		$.post(commonstrings.sidServer+"/rate/linkedin/getFbURL",{
-			uid : vieweeId
-		},
-		function(data){
-			document.getElementById("li_nav").href=data.url;
-		});
+		processCommentPopup(vieweeId,myId,undefined,"getComments");
 	}catch(e){
-		document.getElementById("li_nav").addEventListener('click',function(){
-			notie.alert(3, 'Facebook profile not connected', 3);
-		});
+		console.error(e);
 	}
+	
+}
+
+function processCommentsHTML(html,type){
+	
+	var targetId = vieweeId;
+	
+	var profile = document.getElementById("profile");
+	var background = document.getElementById("background");
+	if(!background){
+		return;
+	}
+	var node = document.createElement("div");
+	
+	profile.insertBefore(node,background);
+	node.outerHTML = html;
+	processCommentPopup(targetId,myId,"selectedComment",type);
+}
+
+function processCommentPopup(targetId,myId,btnOptional,type,popupData){
+	//console.log("vieweing comments");
+	var claimId;
+	if(popupData){
+		claimId = hex_md5(popupData.claim.getAttribute("data-html").toLowerCase());
+	}	
+	var emptyComment = "No profile comments available. Be the first to comment on this profile";
+	var postExecute = function(data){
+		if(document.getElementById("sidComment")){
+			emptyComment = "No profile comments available. Be the first to comment on this profile";
+			options.title = "Profile Reviews";
+			var comment;
+			if(data.comments[data.comments.length -1]){
+				comment = data.comments[data.comments.length -1].comment;
+			}else{
+				comment = emptyComment;
+			}
+			if(comment.length > 200){
+				comment = comment.substring(0,196) + " (...)";
+			}
+			document.getElementById("sidComment").innerText = comment;
+		}
+	};
+	sendAjax("POST","/rate/linkedin/getComments",{targetid : targetId,myid: myId},postExecute);
+	
+	var options = {
+		title: "sid Comments",
+		content: emptyComment,
+		input:true,
+		buttons: [
+			{
+				label: "Close",
+				id:"closeModal",
+				func:"close",
+				half: true
+			},
+			{
+				label: "Add Comment",
+				id:"addCommentBtn",
+				func:"addComment",
+				half: true,
+				type: type,
+				network: "linkedin",
+				claimid: claimId,
+				myId: myId,
+				targetId: targetId,
+				popupData: popupData
+			}
+		],
+		autoload: false
+	};
+	var btn = document.getElementById("view-comment-btn");
+	if(btnOptional){
+		btn = document.getElementById(btnOptional);
+	}
+	
+	var new_element = btn.cloneNode(true);
+	btn.parentNode.replaceChild(new_element, btn);
+	
+	btn = document.getElementById("view-comment-btn");
+	if(btnOptional){
+		btn = document.getElementById(btnOptional);
+	}
+	
+	btn.addEventListener('click', function(){
+		var postExecute = function(data){
+			var content="";
+			//console.log(data);
+			for(var i=0;i<data.comments.length;i++){
+				content = content+"Comment "+i+": "+data.comments[i].comment+"<br>";
+				if(data.comments[i].mysid === myId){
+					options.buttons[1].label = "Update Comment";
+				}
+			}
+			if(type === "getClaimComments"){
+				emptyComment = "No claim comments available. Be the first to comment on this claim";
+				options.title = "Claim: " + popupData.claim.getAttribute("data-html");
+			}
+			if(content === ""){
+				content = emptyComment;
+			}
+			options.content = content;
+			var modal = new ZMODAL(options);
+			modal.open();
+		};
+		sendAjax("POST","/rate/linkedin/"+type,{targetid : targetId,myid: myId, claimid: claimId},postExecute);
+	});
 }
 
 function commitDropdownChart(profId,node){
@@ -167,7 +359,7 @@ function commitDropdownChart(profId,node){
 
 
 function addChartListener(chartData,chartConfigs,parent){
-	console.log(parent);
+	//console.log(parent);
 	var sidDropdown = parent.getElementsByClassName(chartConfigs.base)[0];
 	//console.log(chartConfigs.base+".............."+sidDropdown);
 	sidDropdown.addEventListener('mouseover', function() {
@@ -251,6 +443,8 @@ function scoreClaims(secIndex, arrIndex, claim, classOffset, isOffset){
 	//console.log(".. .. scoring claims on time line" + claim.innerHTML);
 	if(claim == undefined){return;}
 	arrIndex = 100*secIndex + arrIndex;
+	
+	//var input = claim.getElementsByClassName("comment")[0];
 
 	var rateIcon = document.createElement("DIV");
 	var iconId = 'claimR'+classOffset+arrIndex;
@@ -276,7 +470,7 @@ function scoreClaims(secIndex, arrIndex, claim, classOffset, isOffset){
 		return;
 	}
 	
-	var claimId = hex_md5(claim.getAttribute("data-html"));
+	var claimId = hex_md5(claim.getAttribute("data-html").toLowerCase());
 	
 	try{
 	$.post(commonstrings.sidServer+"/rate/linkedin/getRating",{
@@ -303,6 +497,7 @@ function scoreClaims(secIndex, arrIndex, claim, classOffset, isOffset){
 			popupData.myRating = data.myrating;
 			
 			popUpOnIconByID(popupData);
+			//popupComment(input,claimId);
 		}
 		else{
 			console.log("info .. .. .. Icons already added");
@@ -326,7 +521,43 @@ function scoreClaims(secIndex, arrIndex, claim, classOffset, isOffset){
 			popupData.myRating = -10;
 			
 			popUpOnIconByID(popupData);
+			//popupComment(popupData);
 		}
+	}
+}
+
+function popupComment(node,popupData){
+	var inputHolder = node.getElementsByClassName("hiddenInput")[0];
+	if(!inputHolder){
+		inputHolder = node.getElementsByClassName("shownInput")[0];
+	}else{
+		inputHolder.className = "shownInput";
+	}
+	var input = node.getElementsByClassName("comment")[0];
+	var claimId = hex_md5(popupData.claim.getAttribute("data-html").toLowerCase());
+	
+	if(input){
+		//console.log('adding key event');
+		$(input).keyup(function (e) {
+			if (e.keyCode == 13) {
+				var comment = input.value;
+				var commentId = hex_md5(comment);
+				sendAjax("POST","/rate/linkedin/addComment",{
+					targetid:vieweeId,
+					myid:myId,
+					commentid:commentId,
+					comment:comment,
+					claimid:claimId
+				},function(){
+					notie.alert(1, 'Comment added successfully!', 3);
+					inputHolder.className = "hiddenInput";
+				});
+			}
+		});
+	}else{
+		console.log("error: cannot locate input box");
+		console.log(popupData);
+		console.log(node);
 	}
 }
 /*
@@ -427,6 +658,7 @@ function configureListners(node,popupData){
 	addEventToSendData(node,commonstrings.btnVerifiedIcon,popupData,1);
 	addEventToSendData(node,commonstrings.btnRefutedIcon,popupData,-1);
 	addEventToSendData(node,commonstrings.btnNeutralIcon,popupData,0);
+	addEventToShowComments(popupData);
 	
 	var chartData = {};
 	chartData.yesCount = popupData.yes;
@@ -495,14 +727,23 @@ function addEventToSendData(obj,claimId,iconId,iconClass,targetId,myId,claim,rat
 		});
 	});
 }*/
-
+function addEventToShowComments(popupData){
+	var reviewBtn = popupData.claim.getElementsByClassName("reviewElement")[0];
+	var targetId = vieweeId;
+	var claimId = hex_md5(popupData.claim.getAttribute("data-html").toLowerCase());
+	reviewBtn.id = "claimComment" + claimId;
+	processCommentPopup(targetId,myId,reviewBtn.id,"getClaimComments",popupData);
+	//reviewBtn.click();
+}
 
 function addEventToSendData(node,menuItemName,popupData,rate){
 	
-	var claimId = hex_md5(popupData.claim.getAttribute("data-html"));
+	var claimId = hex_md5(popupData.claim.getAttribute("data-html").toLowerCase());
 	var menuItem =  popupData.claim.getElementsByClassName(menuItemName)[0];
 	var targetId = vieweeId;
-	
+	var fullName = document.getElementsByClassName("full-name")[0].innerText;
+	var profImage = document.getElementsByClassName("profile-picture")[0].getElementsByTagName("img")[0].src;
+		
 	menuItem.addEventListener("click",function(){
 
 		notie.alert(4, 'Adding rating to siD system', 2);
@@ -512,14 +753,16 @@ function addEventToSendData(node,menuItemName,popupData,rate){
 			targetid: targetId,
 			claimid: claimId,
 			claim: claimData,
-			rating: rate
+			rating: rate,
+			name: fullName,
+			img: profImage
 		},
 		function(data){
 			
 			if(data.success !== true){
 				setTimeout(function(){
 					notie.alert(3, 'An unexpected error occured! Please Try Again', 3);
-					console.log("error: "+ JSON.stringify(data));
+					console.log("An unexpected error occured! Please Try Again")
 				},1000)
 			}else{
 				setTimeout(function(){
@@ -532,8 +775,9 @@ function addEventToSendData(node,menuItemName,popupData,rate){
 					myid: myId,
 					claimid : claimId
 				},function(data){
-					console.log(data);
+					//console.log(data);
 					processRatepopup(node,data.myrating);
+					
 					var chartData = {};
 					chartData.yesCount = data.yes;
 					chartData.noCount = data.no;
@@ -572,4 +816,22 @@ function hashId(str){
     }
 	//console.log(hash +" "+ str);
     return hash;
+}
+
+
+function sendAjax(type,url,data,postExecute,onError){
+	$.ajax(commonstrings.sidServer+url,{
+		method: type,
+		data: data,
+		success: function(data){
+			postExecute(data);
+		},
+		error: function(){
+			if(onError){
+				onError();
+			}else{
+				sendAjaxOverHttp('POST',commonstrings.sidServerHttp+url,data,postExecute);
+			}
+		}
+	});
 }

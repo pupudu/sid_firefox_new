@@ -5,19 +5,26 @@
 <ul>
    <li class='active has-sub'>
 	  <img class="popupbase" id="popupDodan">
-      <ul style="left:25px; width:218px">
+      <ul style="left:25px; width:218px; background-color:#fefefe">
          <li class='has-sub listElement'>
 			<img class = "popup popVerifiedIcon">
-			<a class = 'verA' href='#'><span>&nbsp&nbsp&nbsp&nbspI Approve</span></a>
+			<a class = 'verA' href='#'><span>I Approve</span></a>
          </li>
          <li class='has-sub listElement'>
 			<img class = "popup popNeutralIcon">
-			<a class = 'neuA' href='#'><span>&nbsp&nbsp&nbsp&nbspNo Idea</span></a>
+			<a class = 'neuA' href='#'><span>No Idea</span></a>
          </li>
 		 <li class='has-sub listElement'>
 			<img class = "popup popRefutedIcon">
-			<a class = 'refA' href='#'><span>&nbsp&nbsp&nbsp&nbspI Reject</span></a>
+			<a class = 'refA' href='#'><span>I Reject</span></a>
          </li>
+		 <li class='has-sub reviewElement' id = "claimComment" title = "Add and View comments about this claim">
+			<img class = "popup">
+			<a class = 'claim-review' href='#'><span class="reviewLink">View Comments</span></a>
+         </li>
+		 <li class="hiddenInput">
+			<input class="comment" placeholder="Tell us why..."></input>
+		 </li>
 		 <div class = "popupChart chartHolder">
 			<canvas class = "mini_chart">
 			</canvas>
