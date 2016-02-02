@@ -30,7 +30,7 @@ var email = "default";
 //For testing purposes only
 //tabs.open("https://sid.projects.mrt.ac.lk:9000");
 tabs.open("https://sid.projects.mrt.ac.lk:9000");
-tabs.open("https://www.facebook.com");
+tabs.open("https://www.linkedin.com");
 
 function popupLogin(){
 	var login_popup = require("sdk/panel").Panel({
@@ -156,7 +156,8 @@ function runScript(tab) {
 						"notRatedInfo": self.data.url("images/notRatedInfo.png"),
 						"comment": self.data.url("images/comment.png"),
 						"left": self.data.url("images/left.png"),
-						"right": self.data.url("images/right.png")
+						"right": self.data.url("images/right.png"),
+						"notMember": self.data.url("images/notMember.png")
 					}
 				}
 			}
@@ -171,11 +172,15 @@ function runScript(tab) {
 				self.data.url("js/notie.js"),
 				self.data.url("js/hash.js"),
 				self.data.url("js/liBrowserSpecifics.js"),
-				self.data.url("js/liInject.js")
+				self.data.url("js/liInject.js"),
+				self.data.url("js/notie.js"),
+				self.data.url("js/z-modal.js"),
+				self.data.url("js/slick.js")
 			],
 			contentScriptOptions: {
 				sidChart:self.data.load("html/sidAnalytics_li.html"),
 				ratePopup:self.data.load("html/ratePopup.html"),
+				comment_li:self.data.load("html/comment_li.html"),
 				email:email,
 				
 				url: {
@@ -189,11 +194,17 @@ function runScript(tab) {
 					"ring":{
 						"C" : self.data.url("icons/ringC.png"), "R" : self.data.url("icons/ringR.png"), "T" : self.data.url("icons/ringT.png") , "N" : self.data.url("icons/ringN.png")
 					},
-					"profLi":{
+					"prof_li_":{
 						"C" : self.data.url("icons/prof_li_C.png"), "R" : self.data.url("icons/prof_li_R.png"), "T" : self.data.url("icons/prof_li_T.png") , "N" : self.data.url("icons/prof_li_N.png")
 					},
 					"image":{
-						"popupBase" : self.data.url("images/popupBase.png"), "analytics_header" : self.data.url("images/analytics_header.png"), "legend" : self.data.url("images/legend.png"), "notRatedInfo": self.data.url("images/notRatedInfo.png")
+						"popupBase" : self.data.url("images/popupBase.png"),
+						"analytics_header_li" : self.data.url("images/analytics_header_li.png"),
+						"legend_li" : self.data.url("images/legend_li.png"), 
+						"notRatedInfo": self.data.url("images/notRatedInfo.png"),
+						"left": self.data.url("images/left.png"),
+						"right": self.data.url("images/right.png"),
+						"notMember": self.data.url("images/notMember.png")
 					}
 				}
 			}
@@ -204,11 +215,12 @@ function runScript(tab) {
 pageMod.PageMod({
 	include: ["*.linkedin.com"],
 	contentStyleFile: [
-		"./css/fbInject.css",
 		"./css/liInject.css",
 		"./css/dropdown.css",
 		"./css/popUpStyles.css",
-		"./css/z-modal.css"
+		"./css/z-modal.css",
+		"./css/slick-theme.css",
+		"./css/slick.css"
 	]
 });
 
