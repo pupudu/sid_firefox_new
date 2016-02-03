@@ -177,7 +177,7 @@ function processAnalyticsHTML(data){
 				orgNode.className = "carousElementMan";
 				orgNode.src = commonstrings.sidServerHttp+"/organizations/"+org+".png";
 				orgNode.addEventListener('click',function(){
-					window.open(commonstrings.sidServerHttp+"/organizations/"+org);
+					window.open(commonstrings.sidServerHttp+"/organizationProfile?orgid="+org);
 				});
 				document.getElementsByClassName("orgSlick")[0].appendChild(orgNode);
 			});
@@ -188,7 +188,7 @@ function processAnalyticsHTML(data){
 				orgNode.src = commonstrings.sidServerHttp+"/organizations/"+org+".png";
 				document.getElementsByClassName("orgSlick")[0].className += " orgSlickAct";
 				orgNode.addEventListener('click',function(){
-					window.open(commonstrings.sidServerHttp+"/organizations/"+org);
+					window.open(commonstrings.sidServerHttp+"/organizationProfile?orgid="+org);
 				});
 				document.getElementsByClassName("orgSlick")[0].appendChild(orgNode);
 			});
@@ -210,7 +210,7 @@ function processAnalyticsHTML(data){
 		}
 	};
 	
-	sendAjax("POST","/rate/facebook/getMyOrganizations",{myid: vieweeId},postExecute);
+	sendAjax("POST","/rate/linkedin/getMyOrganizations",{myid: vieweeId},postExecute);
 	
 	
 	commitDropdownChart(vieweeId,document);
